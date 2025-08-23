@@ -51,7 +51,7 @@ function App() {
       <ToastContainer />
       <div className="flex">
         {/* Sidebar only for admin routes */}
-        {user && isAdminPanel && <Sidebar />}
+        {user && !isAdminPanel && <Sidebar />}
 
         {/* Main content */}
         <div className="flex-1 flex flex-col">

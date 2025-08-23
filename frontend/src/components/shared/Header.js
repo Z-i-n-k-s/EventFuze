@@ -15,7 +15,7 @@ import Logo from "./Logo";
 import SummaryApi from "../../common";
 import { toast } from "react-toastify";
 import { setUserDetails } from "../../store/userSlice";
-import ROLE from "../../common/role";
+import {ROLE} from "../../common/role";
 import ProfileDisplay from "./ProfileDisplay";
 import { ThemeContext } from "../../context/ThemeContext";
 
@@ -212,7 +212,7 @@ const clubsLinks = [
                         >
                           ✅ <span className="font-medium">Registered Events</span>
                         </Link>
-                        {user?.role === ROLE.ADMIN && (
+                        {user?.role === ROLE.SUPER_ADMIN && (
                           <Link
                             to="/admin-panel/all-users"
                             className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
