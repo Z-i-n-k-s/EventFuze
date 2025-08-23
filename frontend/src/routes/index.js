@@ -14,9 +14,13 @@ import CreateEvent from "../pages/Admin/EventManagement";
 import EventManagement from "../pages/Admin/EventManagement";
 import ClubManagement from "../pages/Admin/ClubManagement";
 import Analytics from "../pages/Admin/Analytics";
-import Home from "../pages/user/home/Home";
-import RegisterEvent from "../pages/user/registerEvent/RegisterEvent";
-import AllEvents from "../pages/user/allEvents/AllEvents";
+import Home from "../pages/user/Home";
+import RegisterEvent from "../pages/user/RegisterEvent";
+import AllEvents from "../pages/user/AllEvents";
+import MyEvents from "../pages/user/MyEvents";
+import ClubDetails from "../pages/user/ClubDetails";
+import JoinClub from "../components/user/JoinClub";
+import JoinForm from "../components/user/JoinForm";
 
 // Redirect component for root path
 const RootRedirect = () => {
@@ -40,6 +44,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: "/", element: <RootRedirect /> },
+
       {
         path: "login",
         element: (
@@ -96,6 +101,13 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+
+       { path: "my-events", element:<ProtectedRoute><MyEvents/></ProtectedRoute> },
+      
+       
+      {path: "/clubs/:clubId", element: <ProtectedRoute><ClubDetails/></ProtectedRoute> },     
+  { path: "joinform", element: <ProtectedRoute><JoinForm/></ProtectedRoute> },
+
 
       {
         path: "admin-panel",

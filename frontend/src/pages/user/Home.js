@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from "react";
 
 // Import images from your assets/home folder
-import img1 from "../../../assest/home/cultural.png";
-import img2 from "../../../assest/home/debate.jpg";
-import img3 from "../../../assest/home/IDC.jpg";
-import img4 from "../../../assest/home/islamic.jpg";
-import img5 from "../../../assest/home/photo.jpg";
-import img6 from "../../../assest/home/robotic.jpg";
+import img1 from "../../assest/home/cultural.png";
+import img2 from "../../assest/home/debate.jpg";
+import img3 from "../../assest/home/IDC.jpg";
+import img4 from "../../assest/home/islamic.jpg";
+import img5 from "../../assest/home/photo.jpg";
+import img6 from "../../assest/home/robotic.jpg";
 
-import UpcomingEvent from "../../../components/user/UpcomingEvent";
+import UpcomingEvent from "../../components/user/UpcomingEvent";
+import JoinClub from "../../components/user/JoinClub";
+import ImagesEvent from "../../components/user/ImagesEvent";
+import LandingScroll from "../../components/user/LandingScroll";
 
 const images = [img1, img2, img3, img4, img5, img6];
 
 const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Example: dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Auto-slide every 3 seconds
   useEffect(() => {
@@ -72,8 +78,11 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Upcoming Events Section */}
+      
+      <LandingScroll></LandingScroll>
       <UpcomingEvent />
+      <ImagesEvent></ImagesEvent>
+      <JoinClub  />
     </div>
   );
 };

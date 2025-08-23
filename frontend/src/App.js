@@ -57,7 +57,7 @@ function App() {
         <div className="flex-1 flex flex-col">
           <Header />
 
-          <main className="min-h-[calc(100vh-120px)] p-4">
+          <main className="min-h-[calc(100vh-120px)]">
             <Outlet />
           </main>
 
