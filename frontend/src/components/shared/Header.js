@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   FaCog,
   FaSignOutAlt,
@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import { setUserDetails } from "../../store/userSlice";
 import ROLE from "../../common/role";
 import ProfileDisplay from "./ProfileDisplay";
+import { ThemeContext } from "../../context/ThemeContext";
 
 const Header = () => {
   const user = useSelector((state) => state?.user?.user);
@@ -25,10 +26,9 @@ const Header = () => {
   const [menuDisplay, setMenuDisplay] = useState(false);
   const [profileDisplay, setProfileDisplay] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => {
-    // Check if dark class exists on document, but default to light theme
-    return document.documentElement.classList.contains("dark");
-  });
+
+  // Use ThemeContext
+  const { theme, toggleTheme } = useContext(ThemeContext);
 
   const handelLogout = async () => {
     try {
@@ -46,17 +46,6 @@ const Header = () => {
       }
     } catch (err) {
       toast.error("Logout failed. Try again!");
-    }
-  };
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    
-    if (newDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
     }
   };
 
@@ -98,10 +87,10 @@ const Header = () => {
 
             {/* Dark/Light Mode Toggle */}
             <button
-              onClick={toggleDarkMode}
+              onClick={toggleTheme}
               className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-200"
             >
-              {darkMode ? (
+              {theme === "dark" ? (
                 <FaSun className="w-5 h-5 text-yellow-400" />
               ) : (
                 <FaMoon className="w-5 h-5 text-slate-600" />
@@ -180,10 +169,7 @@ const Header = () => {
                           className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
                           onClick={() => setMenuDisplay(false)}
                         >
-                          ✅{" "}
-                          <span className="text-sm font-medium">
-                            Registered Events
-                          </span>
+                          ✅ <span className="text-sm font-medium">Registered Events</span>
                         </Link>
 
                         {user?.role === ROLE.ADMIN && (
@@ -193,9 +179,7 @@ const Header = () => {
                             onClick={() => setMenuDisplay(false)}
                           >
                             <FaCog className="w-4 h-4" />
-                            <span className="text-sm font-medium">
-                              Admin Panel
-                            </span>
+                            <span className="text-sm font-medium">Admin Panel</span>
                           </Link>
                         )}
 
@@ -239,10 +223,10 @@ const Header = () => {
           <div className="lg:hidden flex items-center gap-3">
             {/* Dark/Light Mode Toggle - Mobile */}
             <button
-              onClick={toggleDarkMode}
+              onClick={toggleTheme}
               className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-200"
             >
-              {darkMode ? (
+              {theme === "dark" ? (
                 <FaSun className="w-5 h-5 text-yellow-400" />
               ) : (
                 <FaMoon className="w-5 h-5 text-slate-600" />
@@ -283,101 +267,6 @@ const Header = () => {
                   </Link>
                 ))}
               </nav>
-
-              {/* User Section */}
-              {user?._id ? (
-                <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-                  <div className="flex items-center gap-3 mb-4">
-                    {user?.profilePic ? (
-                      <img
-                        src={user?.profilePic}
-                        alt={user?.name}
-                        className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                        <FaUserLarge className="w-5 h-5 text-white" />
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-200">
-                        {user?.name}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {user?.email}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <button
-                      className="flex items-center gap-3 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150 rounded-lg"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setTimeout(() => setProfileDisplay(true), 100);
-                      }}
-                    >
-                      <FaUserCog className="w-4 h-4" />
-                      <span className="text-sm font-medium">Profile Settings</span>
-                    </button>
-
-                    <Link
-                      to="/my-events"
-                      className="flex items-center gap-3 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150 rounded-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      📅 <span className="text-sm font-medium">My Events</span>
-                    </Link>
-
-                    <Link
-                      to="/registered-events"
-                      className="flex items-center gap-3 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150 rounded-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      ✅ <span className="text-sm font-medium">Registered Events</span>
-                    </Link>
-
-                    {user?.role === ROLE.ADMIN && (
-                      <Link
-                        to="/admin-panel/all-users"
-                        className="flex items-center gap-3 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150 rounded-lg"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <FaCog className="w-4 h-4" />
-                        <span className="text-sm font-medium">Admin Panel</span>
-                      </Link>
-                    )}
-
-                    <button
-                      className="flex items-center gap-3 px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-700/30 transition-colors duration-150 rounded-lg mt-2"
-                      onClick={() => {
-                        handelLogout();
-                        setMobileMenuOpen(false);
-                      }}
-                    >
-                      <FaSignOutAlt className="w-4 h-4" />
-                      <span className="text-sm font-medium">Sign Out</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="border-t border-slate-200 dark:border-slate-700 pt-4 flex flex-col gap-3">
-                  <Link
-                    to="/login"
-                    className="px-5 py-3 rounded-xl text-white bg-green-600 hover:bg-green-700 transition-all font-medium text-sm shadow-sm text-center"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/signup"
-                    className="px-5 py-3 rounded-xl text-green-600 border border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all font-medium text-sm text-center"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
             </div>
           </div>
         )}

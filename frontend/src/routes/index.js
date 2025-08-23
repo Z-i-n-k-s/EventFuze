@@ -14,7 +14,7 @@ import CreateEvent from "../pages/Admin/EventManagement";
 import EventManagement from "../pages/Admin/EventManagement";
 import ClubManagement from "../pages/Admin/ClubManagement";
 import Analytics from "../pages/Admin/Analytics";
-import Home from "../pages/user/Home";
+import Home from "../pages/user/home/Home";
 
 // Redirect component for root path
 const RootRedirect = () => {

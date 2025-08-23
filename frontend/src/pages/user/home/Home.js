@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
-
-// Import images from your assets/home folder
-import img1 from "../../assest/home/cultural.png";
-import img2 from "../../assest/home/debate.jpg";
-import img3 from "../../assest/home/IDC.jpg";
-import img4 from "../../assest/home/islamic.jpg";
-import img5 from "../../assest/home/photo.jpg";
-import img6 from "../../assest/home/robotic.jpg";
+import React, { useState, useEffect, useContext } from "react";
+import img1 from "../../../assest/home/cultural.png";
+import img2 from "../../../assest/home/debate.jpg";
+import img3 from "../../../assest/home/IDC.jpg";
+import img4 from "../../../assest/home/islamic.jpg";
+import img5 from "../../../assest/home/photo.jpg";
+import img6 from "../../../assest/home/robotic.jpg";
+import { ThemeContext } from "../../../context/ThemeContext"; 
 
 const images = [img1, img2, img3, img4, img5, img6];
 
@@ -16,9 +15,7 @@ const Home = () => {
   // Auto-slide every 3 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prev) =>
-        prev === images.length - 1 ? 0 : prev + 1
-      );
+      setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     }, 3000);
 
     return () => clearInterval(interval);
@@ -43,12 +40,14 @@ const Home = () => {
         </div>
 
         {/* Dark Shadow Overlay */}
-        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0 bg-black/50 dark:bg-black/70"></div>
 
         {/* Centered Text */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white">
-          <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">Eventify</h1>
-          <p className="text-lg max-w-2xl px-4 drop-shadow-md">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <h1 className="text-5xl font-bold mb-4 drop-shadow-lg text-white dark:text-green-400">
+            Eventify
+          </h1>
+          <p className="text-lg max-w-2xl px-4 drop-shadow-md text-white dark:text-gray-300">
             Discover, connect, and experience amazing events with ease
           </p>
         </div>
@@ -59,8 +58,10 @@ const Home = () => {
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full ${
-                currentIndex === index ? "bg-white" : "bg-gray-400"
+              className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                currentIndex === index
+                  ? "bg-white dark:bg-green-400"
+                  : "bg-gray-400 dark:bg-gray-600"
               }`}
             ></button>
           ))}
