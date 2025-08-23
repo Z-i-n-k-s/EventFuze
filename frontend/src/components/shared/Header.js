@@ -15,7 +15,7 @@ import Logo from "./Logo";
 import SummaryApi from "../../common";
 import { toast } from "react-toastify";
 import { setUserDetails } from "../../store/userSlice";
-import {ROLE} from "../../common/role";
+import { ROLE } from "../../common/role";
 import ProfileDisplay from "./ProfileDisplay";
 import { ThemeContext } from "../../context/ThemeContext";
 
@@ -84,7 +84,9 @@ const clubsLinks = [
                   key={link.path}
                   to={link.path === "/events" ? "/all-events" : link.path}
                   className={`font-medium transition-colors duration-200 ${
-                    isActive(link.path === "/events" ? "/all-events" : link.path)
+                    isActive(
+                      link.path === "/events" ? "/all-events" : link.path
+                    )
                       ? "text-green-600 dark:text-green-400"
                       : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400"
                   }`}
@@ -210,7 +212,8 @@ const clubsLinks = [
                           className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
                           onClick={() => setMenuDisplay(false)}
                         >
-                          ✅ <span className="font-medium">Registered Events</span>
+                          ✅{" "}
+                          <span className="font-medium">Registered Events</span>
                         </Link>
                         {user?.role === ROLE.SUPER_ADMIN && (
                           <Link
@@ -220,6 +223,16 @@ const clubsLinks = [
                           >
                             <FaCog className="w-4 h-4" />
                             <span className="font-medium">Admin Panel</span>
+                          </Link>
+                        )}
+                        {user?.role === ROLE.CLUB_ADMIN && (
+                          <Link
+                            to="/club-admin-panel/club-dashboard"
+                            className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
+                            onClick={() => setMenuDisplay(false)}
+                          >
+                            <FaCog className="w-4 h-4" />
+                            <span className="font-medium">Club Panel</span>
                           </Link>
                         )}
                         <div className="border-t border-slate-100 dark:border-slate-700 my-2"></div>

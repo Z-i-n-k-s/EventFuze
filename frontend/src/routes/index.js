@@ -14,13 +14,13 @@ import CreateEvent from "../pages/Admin/EventManagement";
 import EventManagement from "../pages/Admin/EventManagement";
 import ClubManagement from "../pages/Admin/ClubManagement";
 import Analytics from "../pages/Admin/Analytics";
-import Home from "../pages/user/Home";
-import RegisterEvent from "../pages/user/RegisterEvent";
-import AllEvents from "../pages/user/AllEvents";
-import MyEvents from "../pages/user/MyEvents";
-import ClubDetails from "../pages/user/ClubDetails";
-import JoinClub from "../components/user/JoinClub";
-import JoinForm from "../components/user/JoinForm";
+import Home from "../pages/user/home/Home";
+import RegisterEvent from "../pages/user/registerEvent/RegisterEvent";
+import AllEvents from "../pages/user/allEvents/AllEvents";
+import EventMangement from "../pages/Club-Admin/EventMangement";
+import ClubMembers from "../pages/Club-Admin/ClubMembers";
+import ClubDashboard from "../pages/Club-Admin/ClubDashboard";
+import ClubAdminPanel from "../pages/Club-Admin/ClubAdminPanel";
 
 // Redirect component for root path
 const RootRedirect = () => {
@@ -112,7 +112,7 @@ const router = createBrowserRouter([
       {
         path: "admin-panel",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
             <Adminpanel />
           </ProtectedRoute>
         ),
@@ -120,7 +120,7 @@ const router = createBrowserRouter([
           {
             path: "all-users",
             element: (
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
                 <AllUsers />
               </ProtectedRoute>
             ),
@@ -128,7 +128,7 @@ const router = createBrowserRouter([
           {
             path: "event-management",
             element: (
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
                 <EventManagement />
               </ProtectedRoute>
             ),
@@ -136,7 +136,7 @@ const router = createBrowserRouter([
           {
             path: "club-management",
             element: (
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
                 <ClubManagement />
               </ProtectedRoute>
             ),
@@ -144,8 +144,43 @@ const router = createBrowserRouter([
           {
             path: "analytics",
             element: (
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
                 <Analytics />
+              </ProtectedRoute>
+            ),
+          },
+        ],
+      },
+
+      {
+        path: "club-admin-panel",
+        element: (
+          <ProtectedRoute allowedRoles={["CLUB_ADMIN"]}>
+            <ClubAdminPanel />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: "manage-events",
+            element: (
+              <ProtectedRoute allowedRoles={["CLUB_ADMIN"]}>
+                <EventMangement />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "club-members",
+            element: (
+              <ProtectedRoute allowedRoles={["CLUB_ADMIN"]}>
+                <ClubMembers />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "club-dashboard",
+            element: (
+              <ProtectedRoute allowedRoles={["CLUB_ADMIN"]}>
+                <ClubDashboard />
               </ProtectedRoute>
             ),
           },

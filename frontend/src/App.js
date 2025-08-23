@@ -1,7 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
 import { Outlet, useLocation } from "react-router-dom";
-
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
@@ -9,7 +8,6 @@ import SummaryApi from "./common";
 import Context from "./context";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserDetails } from "./store/userSlice";
-import Sidebar from "./components/shared/Sidebar";
 import Footer from "./components/shared/Footer";
 import Header from "./components/shared/Header";
 
@@ -42,17 +40,14 @@ function App() {
   const isAdminPanel = location.pathname.startsWith("/admin-panel");
 
   // Determine if this is a public route (login, signup, forgot password, reset password)
-  const isPublicRoute = ["/login", "/sign-up", "/forgot-password"].some((path) =>
-    location.pathname.startsWith(path)
+  const isPublicRoute = ["/login", "/sign-up", "/forgot-password"].some(
+    (path) => location.pathname.startsWith(path)
   );
 
   return (
     <Context.Provider value={{ fetchUserDetails }}>
       <ToastContainer />
       <div className="flex">
-        {/* Sidebar only for admin routes */}
-        {user && !isAdminPanel && <Sidebar />}
-
         {/* Main content */}
         <div className="flex-1 flex flex-col">
           <Header />
