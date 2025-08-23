@@ -4,7 +4,7 @@ import App from "../App";
 import Adminpanel from "../pages/Admin/Adminpanel";
 
 import ForgotPassword from "../pages/Shared/ForgotPassword";
-import Home from "../pages/Shared/Home";
+
 import Login from "../pages/Shared/Login";
 import ResetPassword from "../pages/Shared/ResetPassword"; // import
 import SignUP from "../pages/Shared/SignUP";
@@ -14,6 +14,7 @@ import CreateEvent from "../pages/Admin/EventManagement";
 import EventManagement from "../pages/Admin/EventManagement";
 import ClubManagement from "../pages/Admin/ClubManagement";
 import Analytics from "../pages/Admin/Analytics";
+import Home from "../pages/user/Home";
 
 // Redirect component for root path
 const RootRedirect = () => {
