@@ -219,7 +219,7 @@ const ClubAdminPanel = () => {
           isOpen ? "ml-72" : "ml-20"
         }`}
       >
-        <div className="bg-white/70 backdrop-blur-sm shadow-xl rounded-3xl p-8 min-h-full border border-white/20 relative overflow-hidden">
+        <div >
           {/* Decorative background */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-100/40 to-indigo-100/40 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-100/30 to-pink-100/30 rounded-full blur-3xl translate-y-24 -translate-x-24"></div>

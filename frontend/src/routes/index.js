@@ -14,13 +14,17 @@ import CreateEvent from "../pages/Admin/EventManagement";
 import EventManagement from "../pages/Admin/EventManagement";
 import ClubManagement from "../pages/Admin/ClubManagement";
 import Analytics from "../pages/Admin/Analytics";
-import Home from "../pages/user/home/Home";
-import RegisterEvent from "../pages/user/registerEvent/RegisterEvent";
-import AllEvents from "../pages/user/allEvents/AllEvents";
+import Home from "../pages/user/Home";
+
+import AllEvents from "../pages/user/AllEvents";
 import EventMangement from "../pages/Club-Admin/EventMangement";
 import ClubMembers from "../pages/Club-Admin/ClubMembers";
 import ClubDashboard from "../pages/Club-Admin/ClubDashboard";
 import ClubAdminPanel from "../pages/Club-Admin/ClubAdminPanel";
+import RegisterEvent from "../pages/user/RegisterEvent";
+import MyEvents from "../pages/user/MyEvents";
+import ClubDetails from "../pages/user/ClubDetails";
+import JoinForm from "../components/user/JoinForm";
 
 // Redirect component for root path
 const RootRedirect = () => {
