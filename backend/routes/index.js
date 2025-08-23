@@ -16,6 +16,18 @@ const updateProfile = require('../controller/User/updateProfile')
 const userForgotPass = require('../controller/User/userForgotPass')
 const userResetPass = require('../controller/User/userResetPass')
 const verifyResetToken = require('../controller/User/verifyResetToken')
+const getClubs = require('../controller/Club/getClubs')
+const getClubById = require('../controller/Club/getClubById')
+const createClub = require('../controller/Club/createClub')
+const updateClub = require('../controller/Club/updateClub')
+const deleteClub = require('../controller/Club/deleteClub')
+const addMilestone = require('../controller/Club/addMilestone')
+const updateMilestone = require('../controller/Club/updateMilestone')
+const deleteMilestone = require('../controller/Club/deleteMilestone')
+const addMember = require('../controller/Club/addMember')
+const removeMember = require('../controller/Club/removeMember')
+const updateMemberRole = require('../controller/Club/updateMemberRole')
+const joinClub = require('../controller/Club/joinClub')
 
 
 router.post("/signup",userSignUpController)
@@ -40,6 +52,21 @@ router.post("/update-user",authToken,updateUser)
 router.post("/update-profile",authToken,updateProfile)
 router.post("/delete-user",authToken,userDeleteController)
 
+// Club routes
+router.get("/all-club",  getClubs);                        // fetch all clubs
+router.post("/club-details", authToken, getClubById);     // get single club by clubId in body
+router.post("/create-club", authToken, createClub);       // create new club
+router.post("/update-club", authToken, updateClub);       // update club by clubId in body
+router.post("/delete-club", authToken, deleteClub);       // delete club by clubId in body
 
+router.post("/add-milestone", authToken, addMilestone);
+router.post("/update-milestone", authToken, updateMilestone);
+router.post("/delete-milestone", authToken, deleteMilestone);
+
+router.post("/add-member", authToken, addMember);
+router.post("/remove-member", authToken, removeMember);
+router.post("/update-member-role", authToken, updateMemberRole);
+
+router.post("/join-club", authToken, joinClub);
 
 module.exports = router
