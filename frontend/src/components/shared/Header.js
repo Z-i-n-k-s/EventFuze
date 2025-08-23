@@ -26,8 +26,8 @@ const Header = () => {
   const [menuDisplay, setMenuDisplay] = useState(false);
   const [profileDisplay, setProfileDisplay] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [clubsDropdown, setClubsDropdown] = useState(false);
 
-  // Use ThemeContext
   const { theme, toggleTheme } = useContext(ThemeContext);
 
   const handelLogout = async () => {
@@ -53,13 +53,21 @@ const Header = () => {
 
   const navigationLinks = [
     { path: "/", label: "Home" },
-    { path: "/clubs", label: "Clubs" },
     { path: "/events", label: "Events" },
+  ];
+
+  const clubsLinks = [
+    { path: "/clubs/debating", label: "Debating Club" },
+    { path: "/clubs/cultural", label: "Cultural Club" },
+    { path: "/clubs/robotics", label: "Robotics Club" },
+    { path: "/clubs/islamic", label: "Islamic Club" },
+    { path: "/clubs/innovation", label: "Innovation & Design Club" },
+    { path: "/clubs/photography", label: "Photography Club" },
   ];
 
   return (
     <>
-      <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm sticky top-0 z-40">
+      <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm sticky top-0 z-40 font-inter text-[15px]">
         <div className="h-full container mx-auto flex items-center px-4 lg:px-6 justify-between max-w-7xl">
           {/* Logo Section */}
           <Link to="/" className="flex items-center">
@@ -69,13 +77,13 @@ const Header = () => {
           {/* Right Section - Desktop */}
           <div className="hidden lg:flex items-center gap-6">
             {/* Navigation Links */}
-            <nav className="flex items-center gap-6">
+            <nav className="flex items-center gap-6 relative">
               {navigationLinks.map((link) => (
                 <Link
                   key={link.path}
-                  to={link.path}
-                  className={`text-sm font-medium transition-colors duration-200 ${
-                    isActive(link.path)
+                  to={link.path === "/events" ? "/all-events" : link.path}
+                  className={`font-medium transition-colors duration-200 ${
+                    isActive(link.path === "/events" ? "/all-events" : link.path)
                       ? "text-green-600 dark:text-green-400"
                       : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400"
                   }`}
@@ -83,6 +91,47 @@ const Header = () => {
                   {link.label}
                 </Link>
               ))}
+
+              {/* Clubs Dropdown (fixed) */}
+              <div className="relative">
+                <button
+                  onClick={() => setClubsDropdown((prev) => !prev)}
+                  className={`font-medium transition-colors duration-200 flex items-center gap-1 ${
+                    location.pathname.startsWith("/clubs")
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400"
+                  }`}
+                >
+                  Clubs ▼
+                </button>
+
+                {clubsDropdown && (
+                  <>
+                    {/* Close dropdown on outside click */}
+                    <div
+                      className="fixed inset-0 z-30"
+                      onClick={() => setClubsDropdown(false)}
+                    ></div>
+
+                    <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden z-40">
+                      {clubsLinks.map((club, idx) => (
+                        <Link
+                          key={club.path}
+                          to={club.path}
+                          className={`block px-5 py-3 text-[15px] border-b last:border-b-0 border-slate-200 dark:border-slate-700 transition-colors duration-200 ${
+                            isActive(club.path)
+                              ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                              : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-900/20"
+                          }`}
+                          onClick={() => setClubsDropdown(false)}
+                        >
+                          {club.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </nav>
 
             {/* Dark/Light Mode Toggle */}
@@ -97,7 +146,7 @@ const Header = () => {
               )}
             </button>
 
-            {/* User Section */}
+            {/* User Section (unchanged) */}
             {user?._id ? (
               <div className="relative">
                 <button
@@ -117,31 +166,25 @@ const Header = () => {
                       </div>
                     )}
                   </div>
-                  <span className="text-sm font-medium text-slate-900 dark:text-slate-200">
+                  <span className="font-medium text-slate-900 dark:text-slate-200">
                     {user?.name}
                   </span>
                 </button>
-
-                {/* Dropdown Menu */}
                 {menuDisplay && (
                   <>
                     <div
                       className="fixed inset-0 z-30"
                       onClick={() => setMenuDisplay(false)}
                     ></div>
-
                     <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden">
-                      {/* User Info */}
                       <div className="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 truncate">
+                        <p className="font-semibold text-slate-900 dark:text-slate-200 truncate">
                           {user?.name}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                           {user?.email}
                         </p>
                       </div>
-
-                      {/* Menu Items */}
                       <div className="py-2">
                         <button
                           className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
@@ -151,27 +194,22 @@ const Header = () => {
                           }}
                         >
                           <FaUserCog className="w-4 h-4" />
-                          <span className="text-sm font-medium">
-                            Profile Settings
-                          </span>
+                          <span className="font-medium">Profile Settings</span>
                         </button>
-
                         <Link
                           to="/my-events"
                           className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
                           onClick={() => setMenuDisplay(false)}
                         >
-                          📅 <span className="text-sm font-medium">My Events</span>
+                          📅 <span className="font-medium">My Events</span>
                         </Link>
-
                         <Link
                           to="/register-event"
                           className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
                           onClick={() => setMenuDisplay(false)}
                         >
-                          ✅ <span className="text-sm font-medium">Registered Events</span>
+                          ✅ <span className="font-medium">Registered Events</span>
                         </Link>
-
                         {user?.role === ROLE.ADMIN && (
                           <Link
                             to="/admin-panel/all-users"
@@ -179,13 +217,10 @@ const Header = () => {
                             onClick={() => setMenuDisplay(false)}
                           >
                             <FaCog className="w-4 h-4" />
-                            <span className="text-sm font-medium">Admin Panel</span>
+                            <span className="font-medium">Admin Panel</span>
                           </Link>
                         )}
-
                         <div className="border-t border-slate-100 dark:border-slate-700 my-2"></div>
-
-                        {/* Sign Out */}
                         <button
                           className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-700/30 transition-colors duration-150"
                           onClick={() => {
@@ -194,7 +229,7 @@ const Header = () => {
                           }}
                         >
                           <FaSignOutAlt className="w-4 h-4" />
-                          <span className="text-sm font-medium">Sign Out</span>
+                          <span className="font-medium">Sign Out</span>
                         </button>
                       </div>
                     </div>
@@ -205,13 +240,13 @@ const Header = () => {
               <div className="flex gap-3">
                 <Link
                   to="/login"
-                  className="px-5 py-2 rounded-xl text-white bg-green-600 hover:bg-green-700 transition-all font-medium text-sm shadow-sm"
+                  className="px-5 py-2 rounded-xl text-white bg-green-600 hover:bg-green-700 transition-all font-medium shadow-sm"
                 >
                   Login
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-5 py-2 rounded-xl text-green-600 border border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all font-medium text-sm"
+                  className="px-5 py-2 rounded-xl text-green-600 border border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all font-medium"
                 >
                   Sign Up
                 </Link>
@@ -221,7 +256,6 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <div className="lg:hidden flex items-center gap-3">
-            {/* Dark/Light Mode Toggle - Mobile */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-200"
@@ -232,7 +266,6 @@ const Header = () => {
                 <FaMoon className="w-5 h-5 text-slate-600" />
               )}
             </button>
-
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
@@ -246,26 +279,52 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu (unchanged) */}
         {mobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg z-30">
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg z-30 font-inter text-[15px]">
             <div className="container mx-auto px-4 py-4">
-              {/* Navigation Links */}
               <nav className="flex flex-col gap-3 mb-4">
-                {navigationLinks.map((link) => (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    className={`text-sm font-medium py-2 px-3 rounded-lg transition-colors duration-200 ${
-                      isActive(link.path)
-                        ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
-                        : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                <Link
+                  to="/"
+                  className={`font-medium py-2 px-3 rounded-lg transition-colors duration-200 ${
+                    isActive("/")
+                      ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
+                      : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Home
+                </Link>
+                <div className="flex flex-col gap-1">
+                  <span className="font-medium px-3 py-2 text-slate-700 dark:text-slate-200">
+                    Clubs
+                  </span>
+                  {clubsLinks.map((club) => (
+                    <Link
+                      key={club.path}
+                      to={club.path}
+                      className={`font-medium py-2 px-6 rounded-lg transition-colors duration-200 ${
+                        isActive(club.path)
+                          ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
+                          : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {club.label}
+                    </Link>
+                  ))}
+                </div>
+                <Link
+                  to="/all-events"
+                  className={`font-medium py-2 px-3 rounded-lg transition-colors duration-200 ${
+                    isActive("/all-events")
+                      ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
+                      : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Events
+                </Link>
               </nav>
             </div>
           </div>

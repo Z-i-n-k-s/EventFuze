@@ -44,7 +44,7 @@ const Home = () => {
         </div>
 
         {/* Dark Shadow Overlay */}
-        <div className="absolute inset-0 bg-black/50 dark:bg-black/70"></div>
+        <div className="absolute inset-0 bg-black/60 dark:bg-black/80"></div>
 
         {/* Centered Text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
