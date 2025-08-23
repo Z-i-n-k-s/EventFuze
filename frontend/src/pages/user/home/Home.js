@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
+
+// Import images from your assets/home folder
 import img1 from "../../../assest/home/cultural.png";
 import img2 from "../../../assest/home/debate.jpg";
 import img3 from "../../../assest/home/IDC.jpg";
 import img4 from "../../../assest/home/islamic.jpg";
 import img5 from "../../../assest/home/photo.jpg";
 import img6 from "../../../assest/home/robotic.jpg";
-import { ThemeContext } from "../../../context/ThemeContext"; 
+
+import UpcomingEvent from "../../../components/user/UpcomingEvent";
 
 const images = [img1, img2, img3, img4, img5, img6];
 
@@ -22,7 +25,8 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="w-full flex justify-center mt-0">
+    <div className="w-full flex flex-col items-center mt-0">
+      {/* Slider Section */}
       <div className="relative w-full h-[600px] overflow-hidden">
         {/* Sliding Images */}
         <div
@@ -67,6 +71,9 @@ const Home = () => {
           ))}
         </div>
       </div>
+
+      {/* Upcoming Events Section */}
+      <UpcomingEvent />
     </div>
   );
 };

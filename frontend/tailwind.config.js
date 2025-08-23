@@ -10,12 +10,12 @@ module.exports = {
         lightText: "#1f2937",
 
         // Dark mode colors
-        darkBg: "#1e293b",     // Dark background
-        darkText: "#f8fafc",   // Light text on dark background
-        darkPrimary: "#3b82f6", // Example accent color
+        darkBg: "#1e293b",
+        darkText: "#f8fafc",
+        darkPrimary: "#3b82f6",
         darkSecondary: "#64748b",
       },
     },
   },
-  plugins: [require()],
+  plugins: [], // Fixed
 };

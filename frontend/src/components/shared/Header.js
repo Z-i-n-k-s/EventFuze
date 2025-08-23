@@ -165,7 +165,7 @@ const Header = () => {
                         </Link>
 
                         <Link
-                          to="/registered-events"
+                          to="/register-event"
                           className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
                           onClick={() => setMenuDisplay(false)}
                         >
