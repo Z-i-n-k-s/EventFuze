@@ -28,6 +28,7 @@ const addMember = require('../controller/Club/addMember')
 const removeMember = require('../controller/Club/removeMember')
 const updateMemberRole = require('../controller/Club/updateMemberRole')
 const joinClub = require('../controller/Club/joinClub')
+const getClubMembers = require('../controller/Club/getClubMembers')
 
 
 router.post("/signup",userSignUpController)
@@ -64,9 +65,11 @@ router.post("/update-milestone", authToken, updateMilestone);
 router.post("/delete-milestone", authToken, deleteMilestone);
 
 router.post("/add-member", authToken, addMember);
+router.post("/club-members", authToken, getClubMembers);
 router.post("/remove-member", authToken, removeMember);
 router.post("/update-member-role", authToken, updateMemberRole);
 
 router.post("/join-club", authToken, joinClub);
+router.post("/leave-club", authToken, leaveClub);
 
 module.exports = router

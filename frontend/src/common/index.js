@@ -103,10 +103,18 @@ const SummaryApi = {
     url: `${backendDomain}/api/update-member-role`,
     method: "post",
   },
+   getClubMembers: {
+    url: `${backendDomain}/api/club-members`,
+    method: "post",
+  },
 
   // Student Club Actions
   joinClub: {
     url: `${backendDomain}/api/join-club`,
+    method: "post",
+  },
+  leaveClub: {
+    url: `${backendDomain}/api/leave-club`,
     method: "post",
   },
   
