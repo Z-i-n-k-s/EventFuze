@@ -1,4 +1,3 @@
-import SignUP from "../pages/SignUP";
 
 const backendDomin = process.env.REACT_APP_BACKEND_URL; //"http://localhost:8080"
 
@@ -51,6 +50,7 @@ const SummaryApi = {
     url: `${backendDomin}/api/delete-user`,
     method: "post",
   },
+  
 };
 
 export default SummaryApi;

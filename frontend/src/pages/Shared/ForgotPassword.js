@@ -1,9 +1,9 @@
 // src/pages/ForgotPassword.js
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import SummaryApi from "../common";
-import forgotIcon from "../assest/forgotpasswnedSend.gif";
+import SummaryApi from "../../common";
+import forgotIcon from "../../assest/forgotpasswnedSend.gif";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");

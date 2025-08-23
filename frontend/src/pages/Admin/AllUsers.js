@@ -1,15 +1,15 @@
-import React, { useContext, useEffect, useState } from "react";
-import SummaryApi from "../common";
-import { toast } from "react-toastify";
 import moment from "moment";
+import { useContext, useEffect, useState } from "react";
 import { FiEdit } from "react-icons/fi";
-import { MdDelete } from "react-icons/md";
 import { ImProfile } from "react-icons/im";
+import { MdDelete } from "react-icons/md";
 import { ThreeDots } from "react-loader-spinner";
-import ChangeUserRole from "../components/admin/ChangeUserRole";
-import DisplayUserDetails from "../components/admin/DisplayUserDetails";
-import DeleteUserDetails from "../components/admin/DeleteUserDetails";
-import Context from "../context";
+import { toast } from "react-toastify";
+import SummaryApi from "../../common";
+import ChangeUserRole from "../../components/admin/ChangeUserRole";
+import DeleteUserDetails from "../../components/admin/DeleteUserDetails";
+import DisplayUserDetails from "../../components/admin/DisplayUserDetails";
+import Context from "../../context";
 
 const AllUsers = () => {
   const [allUsers, setAllUsers] = useState([]);

@@ -1,9 +1,9 @@
 // src/pages/ResetPassword.js
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import SummaryApi from "../common";
-import resetIcon from "../assest/forgotpasswnedSend.gif"; // reuse your forgot icon
+import SummaryApi from "../../common";
+import resetIcon from "../../assest/forgotpasswnedSend.gif"; // reuse your forgot icon
 
 const ResetPassword = () => {
   const { token } = useParams();

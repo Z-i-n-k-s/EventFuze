@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import loginIcons from "../assest/hello.gif";
-import SummaryApi from "../common";
-import imageTobase64 from "../helpers/imageTobase64";
+import SummaryApi from "../../common";
+import imageTobase64 from "../../helpers/imageTobase64";
+import loginIcons from "../../assest/hello.gif";
 
 const SignUP = () => {
   const [showPassword, setShowPassword] = useState(false);

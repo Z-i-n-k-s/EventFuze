@@ -1,12 +1,15 @@
-import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
 import {
+  FaCalendarAlt,
+  FaUniversity,
   FaUserCircle,
   FaUsers,
 } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
-import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
-import ROLE from "../common/role";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import ROLE from "../../common/role";
+import { FaChartBar } from "react-icons/fa6";
 
 const Adminpanel = () => {
   const user = useSelector((state) => state?.user?.user);
@@ -19,7 +22,11 @@ const Adminpanel = () => {
     }
   }, [user, navigate]);
 
-  const navItems = [{ name: "All Users", icon: <FaUsers />, path: "all-users" }];
+  const navItems = [{ name: "All Users", icon: <FaUsers />, path: "all-users" },
+    { name: "Event management", icon: <FaCalendarAlt/>, path: "event-management" },
+    { name: "Club management", icon: <FaUniversity />, path: "club-management" },
+    { name: "Analytics", icon: <FaChartBar />, path: "analytics" }
+  ];
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">

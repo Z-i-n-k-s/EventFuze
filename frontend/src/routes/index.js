@@ -1,14 +1,19 @@
-import App from "../App";
-import ForgotPassword from "../pages/ForgotPassword";
-import ResetPassword from "../pages/ResetPassword"; // import
-import Home from "../pages/Home";
-import Login from "../pages/Login";
-import SignUP from "../pages/SignUP";
-import Adminpanel from "../pages/Adminpanel";
-import AllUsers from "../pages/AllUsers";
-import ProtectedRoute from "./ProtectedRoute";
 import { useSelector } from "react-redux";
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import App from "../App";
+import Adminpanel from "../pages/Admin/Adminpanel";
+
+import ForgotPassword from "../pages/Shared/ForgotPassword";
+import Home from "../pages/Shared/Home";
+import Login from "../pages/Shared/Login";
+import ResetPassword from "../pages/Shared/ResetPassword"; // import
+import SignUP from "../pages/Shared/SignUP";
+import ProtectedRoute from "./ProtectedRoute";
+import AllUsers from "../pages/Admin/AllUsers";
+import CreateEvent from "../pages/Admin/EventManagement";
+import EventManagement from "../pages/Admin/EventManagement";
+import ClubManagement from "../pages/Admin/ClubManagement";
+import Analytics from "../pages/Admin/Analytics";
 
 // Redirect component for root path
 const RootRedirect = () => {
@@ -45,6 +50,18 @@ const router = createBrowserRouter([
           {
             path: "all-users",
             element: <ProtectedRoute><AllUsers /></ProtectedRoute>,
+          },
+          {
+            path: "event-management",
+            element: <ProtectedRoute><EventManagement /></ProtectedRoute>,
+          },
+          {
+            path: "club-management",
+            element: <ProtectedRoute><ClubManagement /></ProtectedRoute>,
+          },
+          {
+            path: "analytics",
+            element: <ProtectedRoute><Analytics /></ProtectedRoute>,
           },
         ],
       },
