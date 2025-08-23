@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Calendar, Camera, Lightbulb, Cpu, Music, Star, Eye, UserPlus, X } from 'lucide-react';
+import { Calendar, Camera, Lightbulb, Cpu, Music, Eye, UserPlus } from 'lucide-react';
+import ViewDetails from './ViewDetails'; // Use your modal component
+import { Link } from "react-router-dom";
+
 
 const UpcomingEvent = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -16,13 +19,11 @@ const UpcomingEvent = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          // Animate when element enters viewport
           if (entry.isIntersecting) {
             if (entry.target === sectionRef.current) setIsVisible(true);
             if (entry.target === titleRef.current) setTitleVisible(true);
             if (entry.target === descRef.current) setDescVisible(true);
           } else {
-            // Reset when element exits viewport (scroll back up)
             if (entry.target === sectionRef.current) setIsVisible(false);
             if (entry.target === titleRef.current) setTitleVisible(false);
             if (entry.target === descRef.current) setDescVisible(false);
@@ -109,14 +110,13 @@ const UpcomingEvent = () => {
   return (
     <section className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 py-20 px-4 relative overflow-hidden">
       
-      {/* Background */}
+      {/* Background Animations */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 dark:from-blue-500/10 dark:to-purple-800/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-green-400/20 to-blue-600/20 dark:from-green-500/10 dark:to-blue-800/10 rounded-full blur-3xl animate-pulse"></div>
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        
         {/* Header */}
         <div className="text-center mb-16">
           <h1 
@@ -175,7 +175,7 @@ const UpcomingEvent = () => {
           {events.map((event, index) => (
             <div
               key={event.id}
-              className={`group bg-white/80 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl shadow-lg hover:shadow-2xl dark:hover:bg-slate-700/80 transform transition-all duration-500 hover:-translate-y-4 hover:scale-105 overflow-hidden border border-slate-200/50 dark:border-slate-600/50 hover:border-green-400/50 ${
+              className={`group bg-white/80 dark:bg-slate-800/90 rounded-3xl shadow-lg hover:shadow-2xl dark:hover:bg-slate-700/80 transform transition-all duration-500 hover:-translate-y-4 hover:scale-105 overflow-hidden border border-slate-200/50 dark:border-slate-600/50 hover:border-green-400/50 ${
                 isVisible 
                   ? 'translate-y-0 opacity-100 scale-100' 
                   : 'translate-y-20 opacity-0 scale-95'
@@ -189,8 +189,7 @@ const UpcomingEvent = () => {
                   alt={event.title}
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent dark:from-black/50 dark:to-transparent group-hover:from-black/20 dark:group-hover:from-black/30 transition-all duration-500"></div>
-                <div className={`absolute top-4 right-4 ${event.badgeColor} text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg backdrop-blur-sm`}>
+                <div className={`absolute top-4 right-4 ${event.badgeColor} text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg`}>
                   {event.icon}
                   {event.badge}
                 </div>
@@ -204,108 +203,44 @@ const UpcomingEvent = () => {
                 </div>
                 <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 group-hover:text-green-400 transition-colors duration-300">{event.title}</h3>
                 <p className="text-slate-600 dark:text-slate-300 text-sm mb-4 line-clamp-3">{event.description}</p>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="inline-block bg-slate-100/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm">{event.category}</span>
-                </div>
                 <div className="flex gap-2">
-                 <button
-  onClick={() => { 
-    setSelectedEvent(event); 
-    setIsRegistered(false); 
-  }}
-  className="flex-1 bg-green-500 dark:from-slate-600 dark:to-slate-500 hover:green-900 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-2 text-sm"
->
-  <Eye className="w-4 h-4" /> View Details
-</button>
-
-      
+                  <button
+                    onClick={() => { 
+                      setSelectedEvent(event); 
+                      setIsRegistered(false); 
+                    }}
+                    className="flex-1 bg-green-700 hover:bg-green-900 text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+                  >
+                    <Eye className="w-4 h-4" /> View Details
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* View All Events Button */}
-        <div className={`text-center transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`} style={{ transitionDelay: '600ms' }}>
-          <button className="group relative bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 dark:from-green-500 dark:via-blue-500 dark:to-purple-500 hover:from-green-700 hover:via-blue-700 hover:to-purple-700 dark:hover:from-green-400 dark:hover:via-blue-400 dark:hover:to-purple-400 text-white font-bold py-4 px-12 rounded-2xl text-lg transition-all duration-500 transform hover:scale-110 hover:shadow-2xl dark:hover:shadow-blue-400/20 overflow-hidden backdrop-blur-sm">
-            <span className="relative z-10 flex items-center justify-center gap-3">
-              <Calendar className="w-6 h-6" />
-              View All Events
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 dark:from-purple-400 dark:via-blue-400 dark:to-green-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          </button>
-        </div>
-
+      <div
+  className={`text-center transition-all duration-1000 transform ${
+    isVisible
+      ? "translate-y-0 opacity-100 scale-100"
+      : "translate-y-10 opacity-0 scale-95"
+  }`}
+  style={{ transitionDelay: "600ms" }}
+>
+  <Link to="/all-events">
+    <button className="group relative bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 dark:from-green-500 dark:via-blue-500 dark:to-purple-500 hover:from-green-700 hover:via-blue-700 hover:to-purple-700 dark:hover:from-green-400 dark:hover:via-blue-400 dark:hover:to-purple-400 text-white font-bold py-4 px-12 rounded-2xl text-lg transition-all duration-500 transform hover:scale-110 hover:shadow-2xl dark:hover:shadow-blue-400/20 overflow-hidden">
+      <span className="relative z-10 flex items-center justify-center gap-3">
+        <Calendar className="w-6 h-6" />
+        View All Events
+      </span>
+    </button>
+  </Link>
+</div>
       </div>
 
-      {/* Event Details Modal */}
+      {/* Modal */}
       {selectedEvent && (
-        <div className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="relative">
-              <img
-                src={selectedEvent.image}
-                alt={selectedEvent.title}
-                className="w-full h-64 object-cover rounded-t-3xl"
-              />
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="absolute top-4 right-4 bg-white/90 dark:bg-slate-800/90 p-2 rounded-full hover:bg-white dark:hover:bg-slate-700 transition-colors duration-300"
-              >
-                <X className="w-5 h-5 text-slate-800 dark:text-slate-200" />
-              </button>
-              <div className={`absolute top-4 left-4 ${selectedEvent.badgeColor} text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg backdrop-blur-sm`}>
-                {selectedEvent.icon}
-                {selectedEvent.badge}
-              </div>
-            </div>
-
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm text-green-600 dark:text-green-400 font-semibold">{selectedEvent.club}</span>
-                <span className="text-sm text-slate-500 dark:text-slate-300">{selectedEvent.date}</span>
-              </div>
-              
-              <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">{selectedEvent.title}</h2>
-              
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-slate-100/80 dark:bg-slate-700/80 p-3 rounded-xl">
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Location</p>
-                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{selectedEvent.location}</p>
-                </div>
-                <div className="bg-slate-100/80 dark:bg-slate-700/80 p-3 rounded-xl">
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Time</p>
-                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{selectedEvent.time}</p>
-                </div>
-              </div>
-              
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">Event Details</h3>
-                <p className="text-slate-600 dark:text-slate-300">{selectedEvent.details}</p>
-              </div>
-              
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setIsRegistered(!isRegistered)}
-                  className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
-                    isRegistered 
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' 
-                      : 'bg-green-500 hover:bg-green-600 text-white'
-                  }`}
-                >
-                  <UserPlus className="w-5 h-5" />
-                  {isRegistered ? 'Registered' : 'Register Now'}
-                </button>
-                <button
-                  onClick={() => setSelectedEvent(null)}
-                  className="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 py-3 px-6 rounded-xl font-medium transition-colors duration-300"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ViewDetails event={selectedEvent} onClose={() => setSelectedEvent(null)} />
       )}
     </section>
   );

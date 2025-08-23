@@ -56,14 +56,15 @@ const Header = () => {
     { path: "/events", label: "Events" },
   ];
 
-  const clubsLinks = [
-    { path: "/clubs/debating", label: "Debating Club" },
-    { path: "/clubs/cultural", label: "Cultural Club" },
-    { path: "/clubs/robotics", label: "Robotics Club" },
-    { path: "/clubs/islamic", label: "Islamic Club" },
-    { path: "/clubs/innovation", label: "Innovation & Design Club" },
-    { path: "/clubs/photography", label: "Photography Club" },
-  ];
+const clubsLinks = [
+  { id: "debating", label: "Debating Club" },
+  { id: "cultural", label: "Cultural Club" },
+  { id: "robotics", label: "Robotics Club" },
+  { id: "islamic", label: "Islamic Club" },
+  { id: "innovation", label: "Innovation & Design Club" },
+  { id: "photography", label: "Photography Club" },
+];
+
 
   return (
     <>
@@ -113,22 +114,23 @@ const Header = () => {
                       onClick={() => setClubsDropdown(false)}
                     ></div>
 
-                    <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden z-40">
-                      {clubsLinks.map((club, idx) => (
-                        <Link
-                          key={club.path}
-                          to={club.path}
-                          className={`block px-5 py-3 text-[15px] border-b last:border-b-0 border-slate-200 dark:border-slate-700 transition-colors duration-200 ${
-                            isActive(club.path)
-                              ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
-                              : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-900/20"
-                          }`}
-                          onClick={() => setClubsDropdown(false)}
-                        >
-                          {club.label}
-                        </Link>
-                      ))}
-                    </div>
+                 {/* Desktop Clubs Dropdown */}
+<div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden z-40">
+  {clubsLinks.map((club) => (
+    <Link
+      key={club.id}
+      to={`/clubs/${club.id}`} // dynamic route
+      className={`block px-5 py-3 text-[15px] border-b last:border-b-0 border-slate-200 dark:border-slate-700 transition-colors duration-200 ${
+        location.pathname === `/clubs/${club.id}`
+          ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+          : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-900/20"
+      }`}
+      onClick={() => setClubsDropdown(false)}
+    >
+      {club.label}
+    </Link>
+  ))}
+</div>
                   </>
                 )}
               </div>
@@ -295,25 +297,26 @@ const Header = () => {
                 >
                   Home
                 </Link>
-                <div className="flex flex-col gap-1">
-                  <span className="font-medium px-3 py-2 text-slate-700 dark:text-slate-200">
-                    Clubs
-                  </span>
-                  {clubsLinks.map((club) => (
-                    <Link
-                      key={club.path}
-                      to={club.path}
-                      className={`font-medium py-2 px-6 rounded-lg transition-colors duration-200 ${
-                        isActive(club.path)
-                          ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
-                          : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                      }`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {club.label}
-                    </Link>
-                  ))}
-                </div>
+                {/* Mobile Clubs Menu */}
+<div className="flex flex-col gap-1">
+  <span className="font-medium px-3 py-2 text-slate-700 dark:text-slate-200">
+    Clubs
+  </span>
+  {clubsLinks.map((club) => (
+    <Link
+      key={club.id}
+      to={`/clubs/${club.id}`} // dynamic route
+      className={`font-medium py-2 px-6 rounded-lg transition-colors duration-200 ${
+        location.pathname === `/clubs/${club.id}`
+          ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
+          : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+      }`}
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      {club.label}
+    </Link>
+  ))}
+</div>
                 <Link
                   to="/all-events"
                   className={`font-medium py-2 px-3 rounded-lg transition-colors duration-200 ${
