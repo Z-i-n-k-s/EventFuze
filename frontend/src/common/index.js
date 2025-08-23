@@ -117,6 +117,53 @@ const SummaryApi = {
     url: `${backendDomain}/api/leave-club`,
     method: "post",
   },
+
+    // Events
+  createEvent: {
+    url: `${backendDomain}/api/create-event`,
+    method: "post",
+  },
+  getAllEvents: {
+    url: `${backendDomain}/api/all-events`,
+    method: "get",
+  },
+  updateEvent: {
+    url: `${backendDomain}/api/update-event`,
+    method: "put",
+  },
+  deleteEvent: {
+    url: `${backendDomain}/api/delete-event`,
+    method: "delete",
+  },
+  getEventsByClub: {
+    url: `${backendDomain}/api/events/club`,
+    method: "post",
+  },
+
+  // Registration
+  registerForEvent: {
+    url: `${backendDomain}/api/register-event`,
+    method: "post",
+  },
+  cancelRegistration: {
+    url: `${backendDomain}/api/cancel-registration`,
+    method: "post",
+  },
+  getRegistrationsByEvent: {
+    url: `${backendDomain}/api/registrations-by-event`,
+    method: "post",
+  },
+  getRegistrationsByStudent: {
+    url: `${backendDomain}/api/registrations-by-student`,
+    method: "post",
+  },
+
+  // certificate upload
+  uploadCertificate: {
+    url: `${backendDomain}/api/upload-certificate`,
+    method: "post",
+  },
+
   
 };
 

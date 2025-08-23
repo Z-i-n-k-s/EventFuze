@@ -29,6 +29,17 @@ const removeMember = require('../controller/Club/removeMember')
 const updateMemberRole = require('../controller/Club/updateMemberRole')
 const joinClub = require('../controller/Club/joinClub')
 const getClubMembers = require('../controller/Club/getClubMembers')
+const createEvent = require('../controller/Event/createEvent')
+const getAllEvents = require('../controller/Event/getAllEvents')
+const updateEvent = require('../controller/Event/updateEvent')
+const deleteEvent = require('../controller/Event/deleteEvent')
+const getEventsByClub = require('../controller/Event/getEventsByClub')
+const registerForEvent = require('../controller/Register/registerForEvent')
+const cancelRegistration = require('../controller/Register/cancelRegistration')
+const getRegistrationsByEvent = require('../controller/Register/getRegistrationsByEvent')
+const getRegistrationsByStudent = require('../controller/Register/getRegistrationsByStudent')
+const uploadCertificate = require('../controller/Register/uploadCertificate')
+const leaveClub = require('../controller/Club/leaveClub')
 
 
 router.post("/signup",userSignUpController)
@@ -71,5 +82,22 @@ router.post("/update-member-role", authToken, updateMemberRole);
 
 router.post("/join-club", authToken, joinClub);
 router.post("/leave-club", authToken, leaveClub);
+
+//Events
+router.post("/create-event",authToken,  createEvent);
+router.get("/all-events", getAllEvents);
+router.put("/update-event",authToken,  updateEvent);
+router.delete("/delete-event", authToken, deleteEvent);
+router.post("/events/club", getEventsByClub);
+
+// Registration routes
+router.post("/register-event", registerForEvent);
+router.post("/cancel-registration", authToken, cancelRegistration);
+router.post("/registrations-by-event", authToken, getRegistrationsByEvent);
+router.post("/registrations-by-student", authToken, getRegistrationsByStudent);
+
+// Admin-only certificate upload
+router.post("/upload-certificate", authToken, uploadCertificate);
+
 
 module.exports = router

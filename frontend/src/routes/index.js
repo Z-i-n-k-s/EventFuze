@@ -18,7 +18,6 @@ import Home from "../pages/user/home/Home";
 import RegisterEvent from "../pages/user/registerEvent/RegisterEvent";
 import AllEvents from "../pages/user/allEvents/AllEvents";
 
-
 // Redirect component for root path
 const RootRedirect = () => {
   const user = useSelector((state) => state?.user?.user);
@@ -41,33 +40,102 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: "/", element: <RootRedirect /> },
-      { path: "login", element: <GuestRoute><Login /></GuestRoute> },
-      { path: "forgot-password", element: <GuestRoute><ForgotPassword /></GuestRoute> },
-      { path: "reset-password/:token", element: <GuestRoute><ResetPassword /></GuestRoute> }, 
-      { path: "sign-up", element: <GuestRoute><SignUP /></GuestRoute> },
-      { path: "home", element: <ProtectedRoute><Home/></ProtectedRoute> },
-      { path: "register-event", element:<ProtectedRoute><RegisterEvent/></ProtectedRoute> },
-       { path: "all-events", element: <ProtectedRoute><AllEvents/></ProtectedRoute> },
-     
+      {
+        path: "login",
+        element: (
+          <GuestRoute>
+            <Login />
+          </GuestRoute>
+        ),
+      },
+      {
+        path: "forgot-password",
+        element: (
+          <GuestRoute>
+            <ForgotPassword />
+          </GuestRoute>
+        ),
+      },
+      {
+        path: "reset-password/:token",
+        element: (
+          <GuestRoute>
+            <ResetPassword />
+          </GuestRoute>
+        ),
+      },
+      {
+        path: "sign-up",
+        element: (
+          <GuestRoute>
+            <SignUP />
+          </GuestRoute>
+        ),
+      },
+      {
+        path: "home",
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "register-event",
+        element: (
+          <ProtectedRoute>
+            <RegisterEvent />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "all-events",
+        element: (
+          <ProtectedRoute>
+            <AllEvents />
+          </ProtectedRoute>
+        ),
+      },
+
       {
         path: "admin-panel",
-        element: <ProtectedRoute><Adminpanel /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute>
+            <Adminpanel />
+          </ProtectedRoute>
+        ),
         children: [
           {
             path: "all-users",
-            element: <ProtectedRoute><AllUsers /></ProtectedRoute>,
+            element: (
+              <ProtectedRoute>
+                <AllUsers />
+              </ProtectedRoute>
+            ),
           },
           {
             path: "event-management",
-            element: <ProtectedRoute><EventManagement /></ProtectedRoute>,
+            element: (
+              <ProtectedRoute>
+                <EventManagement />
+              </ProtectedRoute>
+            ),
           },
           {
             path: "club-management",
-            element: <ProtectedRoute><ClubManagement /></ProtectedRoute>,
+            element: (
+              <ProtectedRoute>
+                <ClubManagement />
+              </ProtectedRoute>
+            ),
           },
           {
             path: "analytics",
-            element: <ProtectedRoute><Analytics /></ProtectedRoute>,
+            element: (
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            ),
           },
         ],
       },
