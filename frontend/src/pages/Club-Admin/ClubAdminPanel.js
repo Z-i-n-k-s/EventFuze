@@ -60,10 +60,6 @@ const ClubAdminPanel = () => {
         animate={{ width: isOpen ? 280 : 80 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="bg-white/80 dark:bg-slate-800/95 backdrop-blur-xl shadow-2xl flex flex-col fixed h-full border-r border-white/20 dark:border-slate-700/50 z-40"
-        style={{
-          background:
-            "linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)",
-        }}
       >
         {/* Profile Section */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200/50 dark:border-slate-700/50 bg-gradient-to-r from-blue-600/5 to-indigo-600/5 dark:from-blue-800/10 dark:to-indigo-800/10">
@@ -132,12 +128,12 @@ const ClubAdminPanel = () => {
                   onMouseLeave={hideTooltip}
                   className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 group relative overflow-hidden ${
                     isActive
-                      ? "bg-green-800"
+                      ? "bg-green-500 text-white shadow-lg shadow-green-500/25 transform scale-[1.02]"
                       : "text-slate-600 dark:text-slate-400 hover:bg-slate-50/80 dark:hover:bg-slate-700/80 hover:text-slate-900 dark:hover:text-slate-100 hover:shadow-md hover:transform hover:scale-[1.01]"
                   }`}
                 >
                   {isActive && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-indigo-500/20 rounded-2xl"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-green-500/20 rounded-2xl"></div>
                   )}
                   <div
                     className={`relative z-10 ${
