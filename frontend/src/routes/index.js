@@ -5,26 +5,25 @@ import Adminpanel from "../pages/Admin/Adminpanel";
 
 import ForgotPassword from "../pages/Shared/ForgotPassword";
 
+import AllUsers from "../pages/Admin/AllUsers";
+import Analytics from "../pages/Admin/Analytics";
+import ClubManagement from "../pages/Admin/ClubManagement";
+import EventManagement from "../pages/Admin/EventManagement";
 import Login from "../pages/Shared/Login";
 import ResetPassword from "../pages/Shared/ResetPassword"; // import
 import SignUP from "../pages/Shared/SignUP";
-import ProtectedRoute from "./ProtectedRoute";
-import AllUsers from "../pages/Admin/AllUsers";
-import CreateEvent from "../pages/Admin/EventManagement";
-import EventManagement from "../pages/Admin/EventManagement";
-import ClubManagement from "../pages/Admin/ClubManagement";
-import Analytics from "../pages/Admin/Analytics";
 import Home from "../pages/user/Home";
+import ProtectedRoute from "./ProtectedRoute";
 
-import AllEvents from "../pages/user/AllEvents";
-import EventMangement from "../pages/Club-Admin/EventMangement";
-import ClubMembers from "../pages/Club-Admin/ClubMembers";
-import ClubDashboard from "../pages/Club-Admin/ClubDashboard";
-import ClubAdminPanel from "../pages/Club-Admin/ClubAdminPanel";
-import RegisterEvent from "../pages/user/RegisterEvent";
-import MyEvents from "../pages/user/MyEvents";
-import ClubDetails from "../pages/user/ClubDetails";
 import JoinForm from "../components/user/JoinForm";
+import ClubAdminPanel from "../pages/Club-Admin/ClubAdminPanel";
+import ClubDashboard from "../pages/Club-Admin/ClubDashboard";
+import ClubMembers from "../pages/Club-Admin/ClubMembers";
+import EventMangement from "../pages/Club-Admin/EventMangement";
+import AllEvents from "../pages/user/AllEvents";
+import ClubDetails from "../pages/user/ClubDetails";
+import MyEvents from "../pages/user/MyEvents";
+import RegisterEvent from "../pages/user/RegisterEvent";
 
 // Redirect component for root path
 const RootRedirect = () => {

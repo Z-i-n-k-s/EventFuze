@@ -16,10 +16,35 @@ async function createEvent(req, res) {
       createdBy,
       registrationFee,
       currency,
+      registrationStart,
+      registrationDeadline,
     } = req.body;
 
-    if (!title || !date || !startTime || !endTime || !location || !clubsId?.length) {
-      return res.status(400).json({ message: "Missing required fields", success: false, error: true });
+    // Check required fields
+    if (
+      !title ||
+      !date ||
+      !startTime ||
+      !endTime ||
+      !location ||
+      !clubsId?.length ||
+      !registrationStart ||
+      !registrationDeadline
+    ) {
+      return res.status(400).json({
+        message: "Missing required fields",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Ensure registration dates are valid
+    if (new Date(registrationDeadline) < new Date(registrationStart)) {
+      return res.status(400).json({
+        message: "Registration deadline cannot be before registration start date",
+        success: false,
+        error: true,
+      });
     }
 
     const newEvent = new eventModel({
@@ -35,7 +60,9 @@ async function createEvent(req, res) {
       images: images || [],
       createdBy,
       registrationFee: registrationFee || 0,
-      currency: currency || "USD",
+      currency: currency || "BDT",
+      registrationStart,
+      registrationDeadline,
     });
 
     const savedEvent = await newEvent.save();
@@ -47,7 +74,11 @@ async function createEvent(req, res) {
       error: false,
     });
   } catch (err) {
-    res.status(400).json({ message: err.message || err, success: false, error: true });
+    res.status(400).json({
+      message: err.message || err,
+      success: false,
+      error: true,
+    });
   }
 }
 

@@ -16,7 +16,28 @@ const ClubManagement = () => {
   const [editingClub, setEditingClub] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
+const [events, setEvents] = useState([]);
 
+// Fetch all events
+const fetchEvents = useCallback(async () => {
+  try {
+    const response = await fetch(SummaryApi.getAllEvents.url, {
+      method: SummaryApi.getAllEvents.method,
+      credentials: 'include',
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setEvents(data.data);
+    } else {
+      toast.error(data.message || "Failed to fetch events");
+    }
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    toast.error("Failed to fetch events");
+  }
+}, []);
 
   // Fetch all clubs from backend
   const fetchClubs = useCallback(async () => {
@@ -45,7 +66,8 @@ const ClubManagement = () => {
   // Load clubs on component mount
   useEffect(() => {
     fetchClubs();
-  }, [fetchClubs]);
+    fetchEvents();
+  }, [fetchClubs, fetchEvents]);
 
   
   // Add new club function for DialogueBox
@@ -74,6 +96,7 @@ const ClubManagement = () => {
     }
   }, [fetchClubs]);
 
+const totalEvents = events.length;
 
 
   // Update club function for DialogueBox
@@ -196,6 +219,7 @@ const ClubManagement = () => {
           activeClubs={totalClubs}
           totalMembers={totalMembers}
           clubs={clubs}
+          totalEvents={totalEvents}
         />
 
         {/* Search */}
