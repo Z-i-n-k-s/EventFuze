@@ -1,120 +1,95 @@
-import { AlertCircle, Calendar, CheckCircle, Clock, MapPin, Trash2, XCircle } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
-import { getEventStatus, getStatusBadgeConfig } from '../../helpers/eventStatusHelper';
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle,
+  Clock,
+  MapPin,
+  Trash2,
+  XCircle,
+} from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { getEventStatus, getStatusBadgeConfig } from "../../helpers/eventStatusHelper";
+import SummaryApi from "../../common"; // Your API helper
 
 const RegisterEvent = () => {
   const [registeredEvents, setRegisteredEvents] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [showUnregisterModal, setShowUnregisterModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [loading, setLoading] = useState(false);
+
   const sectionRef = useRef(null);
+  const user = useSelector((state) => state?.user?.user);
 
-  // Demo data - loads immediately
-  useEffect(() => {
-    const demoEvents = [
-      {
-        id: 1,
-        title: "Photography Workshop",
-        date: "2024-12-15",
-        time: "10:00 AM",
-        location: "Creative Studio, Building A",
-        status: "upcoming",
-        club: "Photography Club",
-        registeredAt: "2024-11-20"
-      },
-      {
-        id: 2,
-        title: "Innovation Challenge",
-        date: "2024-12-20",
-        time: "2:00 PM",
-        location: "Innovation Hub, Floor 3",
-        status: "upcoming",
-        club: "Innovation & Design",
-        registeredAt: "2024-11-25"
-      },
-      {
-        id: 3,
-        title: "Cultural Festival",
-        date: "2024-12-05",
-        time: "6:00 PM",
-        location: "Main Auditorium",
-        status: "completed",
-        club: "Cultural Club",
-        registeredAt: "2024-11-10"
-      },
-      {
-        id: 4,
-        title: "Tech Talk Series",
-        date: "2024-12-18",
-        time: "4:00 PM",
-        location: "Tech Center, Room 201",
-        status: "cancelled",
-        club: "Tech Club",
-        registeredAt: "2024-11-15"
-      },
-      {
-        id: 5,
-        title: "Islamic Study Circle",
-        date: "Every Friday",
-        time: "7:00 PM",
-        location: "Community Center",
-        status: "ongoing",
-        club: "Islamic Society",
-        registeredAt: "2024-10-05"
-      },
-      {
-        id: 6,
-        title: "Robotics Championship",
-        date: "2024-12-25",
-        time: "9:00 AM",
-        location: "Engineering Building",
-        status: "upcoming",
-        club: "Robotics Club",
-        registeredAt: "2024-11-30"
-      }
-    ];
-
-    setRegisteredEvents(demoEvents);
-  }, []);
-
+  // Intersection Observer for animation
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
+      ([entry]) => entry.isIntersecting && setIsVisible(true),
       { threshold: 0.1 }
     );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => sectionRef.current && observer.unobserve(sectionRef.current);
   }, []);
 
-  const getStatusBadge = (event) => {
-    const status = getEventStatus(event);
-    const config = getStatusBadgeConfig(status);
-    
-    const iconMap = {
-      'Clock': <Clock className="w-3 h-3" />,
-      'TrendingUp': <CheckCircle className="w-3 h-3" />,
-      'CheckCircle': <CheckCircle className="w-3 h-3" />,
-      'XCircle': <XCircle className="w-3 h-3" />
+  // Fetch registered events
+  useEffect(() => {
+    const fetchRegisteredEvents = async () => {
+      if (!user?._id) return;
+      setLoading(true);
+      try {
+        const res = await fetch(SummaryApi.getRegistrationsByStudent.url, {
+          method: SummaryApi.getRegistrationsByStudent.method,
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ studentId: user._id }),
+        });
+
+        const result = await res.json();
+        if (!res.ok || !result.success) throw new Error(result.message || "Failed to get registered events");
+
+        const events = result.data.map((registration) => ({
+          id: registration.event._id,
+          title: registration.event.title,
+          description: registration.event.description,
+          date: registration.event.date,
+          time: registration.event.startTime,
+          location: registration.event.location,
+          club: registration.event.clubsId?.[0] || "",
+          registeredAt: registration.registeredAt,
+          registrationStatus: registration.status, // use registration status
+          eventStatus: registration.event.status,  // optional
+        }));
+
+        setRegisteredEvents(events);
+      } catch (error) {
+        console.error("Error fetching registered events:", error);
+        alert("Failed to get registered events.");
+      } finally {
+        setLoading(false);
+      }
     };
-    
+
+    fetchRegisteredEvents();
+  }, [user]);
+
+  // Helper for status badge
+  const getStatusBadge = (event) => {
+    const status = event.registrationStatus || getEventStatus(event); // use registrationStatus if exists
+    const config = getStatusBadgeConfig(status);
+    const iconMap = {
+      Clock: <Clock className="w-3 h-3" />,
+      TrendingUp: <CheckCircle className="w-3 h-3" />,
+      CheckCircle: <CheckCircle className="w-3 h-3" />,
+      XCircle: <XCircle className="w-3 h-3" />,
+    };
     return {
       color: config.color,
       icon: iconMap[config.icon] || <AlertCircle className="w-3 h-3" />,
-      label: config.label
+      label: config.label,
+      status,
     };
   };
 
@@ -123,37 +98,49 @@ const RegisterEvent = () => {
     setShowUnregisterModal(true);
   };
 
-  const confirmUnregister = () => {
-    setRegisteredEvents(prev => prev.filter(event => event.id !== selectedEvent.id));
-    setShowUnregisterModal(false);
-    setSelectedEvent(null);
+  // Unregister API call
+  const confirmUnregister = async () => {
+    if (!selectedEvent) return;
+    setLoading(true);
+    try {
+      const res = await fetch(SummaryApi.cancelRegistration.url, {
+        method: SummaryApi.cancelRegistration.method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId: user._id, eventId: selectedEvent.id }),
+      });
+
+      const result = await res.json();
+      if (!res.ok || !result.success) throw new Error(result.message || "Failed to unregister event");
+
+      setRegisteredEvents((prev) => prev.filter((e) => e.id !== selectedEvent.id));
+      setShowUnregisterModal(false);
+      setSelectedEvent(null);
+    } catch (error) {
+      console.error("Error unregistering event:", error);
+      alert("Failed to unregister event.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "";
     if (dateString === "Every Friday") return dateString;
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   };
 
-  // Filtered events based on search and status
-  const filteredEvents = registeredEvents.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const autoStatus = getEventStatus(event);
-    const matchesStatus = filterStatus === 'all' || autoStatus === filterStatus;
-    return matchesSearch && matchesStatus;
+  const filteredEvents = registeredEvents.filter((event) => {
+    const status = event.registrationStatus || getEventStatus(event);
+    return event.title.toLowerCase().includes(searchQuery.toLowerCase()) && (filterStatus === "all" || status === filterStatus);
   });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 py-20 px-4">
       <div className="max-w-4xl mx-auto" ref={sectionRef}>
         {/* Header */}
-        <div className={`text-center mb-12 transition-all duration-1000 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
+        <div className={`text-center mb-12 transition-all duration-1000 transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-700 via-blue-600 to-purple-600 dark:from-white dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-4">
             My Registered Events
           </h1>
@@ -162,40 +149,8 @@ const RegisterEvent = () => {
           </p>
         </div>
 
-        {/* Stats */}
-        <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 transition-all duration-1000 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`} style={{ transitionDelay: '200ms' }}>
-          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center border border-slate-200/50 dark:border-slate-600/50">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {filteredEvents.length}
-            </div>
-            <div className="text-sm text-slate-600 dark:text-slate-300">Total</div>
-          </div>
-          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center border border-slate-200/50 dark:border-slate-600/50">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {filteredEvents.filter(e => getEventStatus(e) === 'upcoming').length}
-            </div>
-            <div className="text-sm text-slate-600 dark:text-slate-300">Upcoming</div>
-          </div>
-          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center border border-slate-200/50 dark:border-slate-600/50">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {filteredEvents.filter(e => getEventStatus(e) === 'ongoing').length}
-            </div>
-            <div className="text-sm text-slate-600 dark:text-slate-300">Ongoing</div>
-          </div>
-          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center border border-slate-200/50 dark:border-slate-600/50">
-            <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">
-              {filteredEvents.filter(e => getEventStatus(e) === 'completed').length}
-            </div>
-            <div className="text-sm text-slate-600 dark:text-slate-300">Completed</div>
-          </div>
-        </div>
-
         {/* Search & Filter */}
-        <div className={`flex flex-col sm:flex-row gap-4 mb-8 transition-all duration-1000 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
+        <div className={`flex flex-col sm:flex-row gap-4 mb-8 transition-all duration-1000 transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
           <input
             type="text"
             placeholder="Search by event title..."
@@ -209,84 +164,15 @@ const RegisterEvent = () => {
             className="p-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Status</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="ongoing">Ongoing</option>
-            <option value="completed">Completed</option>
+            <option value="registered">Registered</option>
             <option value="cancelled">Cancelled</option>
           </select>
         </div>
 
         {/* Events List */}
-        <div className="space-y-4">
-          {filteredEvents.map((event, index) => {
-            const statusConfig = getStatusBadge(event);
-            
-            return (
-              <div
-                key={event.id}
-                className={`bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 dark:border-slate-600/50 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1 ${
-                  isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-                }`}
-                style={{ transitionDelay: `${400 + index * 100}ms` }}
-              >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  {/* Event Info */}
-                  <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
-                      <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-                        {event.title}
-                      </h3>
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusConfig.color} w-fit`}>
-                        {statusConfig.icon}
-                        {statusConfig.label}
-                      </span>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-slate-600 dark:text-slate-300">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{formatDate(event.date)}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        <span>{event.time}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4" />
-                        <span>{event.location}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-2 text-sm">
-                      <span className="text-green-600 dark:text-green-400 font-medium">{event.club}</span>
-                      <span className="text-slate-500 dark:text-slate-400"> • Registered: {formatDate(event.registeredAt)}</span>
-                    </div>
-                  </div>
-
-                  {/* Action Button */}
-                  <div className="flex-shrink-0">
-                    {(getEventStatus(event) === 'upcoming' || getEventStatus(event) === 'ongoing') ? (
-                      <button
-                        onClick={() => handleUnregister(event)}
-                        className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:shadow-lg flex items-center gap-2 transform hover:scale-105"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Unregister
-                      </button>
-                    ) : (
-                      <div className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-4 py-2 rounded-xl font-medium cursor-not-allowed">
-                        {getEventStatus(event) === 'completed' ? 'Completed' : 'Cancelled'}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Empty State */}
-        {filteredEvents.length === 0 && (
+        {loading ? (
+          <div className="text-center py-10">Loading...</div>
+        ) : filteredEvents.length === 0 ? (
           <div className="text-center py-20">
             <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">
@@ -295,6 +181,66 @@ const RegisterEvent = () => {
             <p className="text-slate-600 dark:text-slate-400">
               No events match your search or filter criteria.
             </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredEvents.map((event, index) => {
+              const statusConfig = getStatusBadge(event);
+              return (
+                <div
+                  key={event.id}
+                  className={`bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 dark:border-slate-600/50 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+                  style={{ transitionDelay: `${400 + index * 100}ms` }}
+                >
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">{event.title}</h3>
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusConfig.color} w-fit`}>
+                          {statusConfig.icon} {statusConfig.label}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-slate-600 dark:text-slate-300">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(event.date)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          <span>{event.time}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4" />
+                          <span>{event.location}</span>
+                        </div>
+                      </div>
+                      <div className="mt-2 text-sm">
+                        <span className="text-slate-500 dark:text-slate-400"> • Registered: {formatDate(event.registeredAt)}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex-shrink-0">
+                      {statusConfig.status === "registered" ? (
+                        <button
+                          onClick={() => handleUnregister(event)}
+                          className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:shadow-lg flex items-center gap-2 transform hover:scale-105"
+                        >
+                          <Trash2 className="w-4 h-4" /> Unregister
+                        </button>
+                      ) : (
+                        <div className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-4 py-2 rounded-xl font-medium cursor-not-allowed">
+                          {statusConfig.status === "cancelled"
+                            ? "Cancelled"
+                            : statusConfig.status === "completed"
+                            ? "Completed"
+                            : "Unavailable"}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -306,15 +252,9 @@ const RegisterEvent = () => {
                 <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">
-                  Unregister from Event?
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400 mb-2">
-                  Are you sure you want to unregister from:
-                </p>
-                <p className="font-semibold text-slate-800 dark:text-slate-200 mb-6">
-                  "{selectedEvent.title}"
-                </p>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Unregister from Event?</h3>
+                <p className="text-slate-600 dark:text-slate-400 mb-2">Are you sure you want to unregister from:</p>
+                <p className="font-semibold text-slate-800 dark:text-slate-200 mb-6">"{selectedEvent.title}"</p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowUnregisterModal(false)}
