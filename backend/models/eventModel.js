@@ -27,6 +27,9 @@ const eventSchema = new mongoose.Schema(
       min: [0, "Registration fee cannot be negative"],
     },
     currency: { type: String, default: "USD" },
+    // Registration period
+    registrationStart: { type: Date, required: true },
+    registrationDeadline: { type: Date, required: true },
   },
   { timestamps: true }
 );
@@ -34,6 +37,12 @@ const eventSchema = new mongoose.Schema(
 // Automatically update `isFree` based on fee value
 eventSchema.pre("save", function (next) {
   this.isFree = this.registrationFee === 0;
+
+  // Optional: ensure registration deadline is after start
+  if (this.registrationDeadline < this.registrationStart) {
+    return next(new Error("Registration deadline cannot be before registration start date"));
+  }
+
   next();
 });
 

@@ -1,7 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
+import SummaryApi from "../../common";
 
-const RemoveMemberModal = ({ member, onClose, onConfirm }) => {
+const RemoveMemberModal = ({ member, clubId, onClose, onConfirm }) => {
+  const [showLoader, setShowLoader] = useState(false);
+
   if (!member) return null;
+
+  const removeMember = async () => {
+    if (!member._id || !clubId) return;
+    setShowLoader(true);
+    try {
+      const res = await fetch(SummaryApi.removeMember.url, {
+        method: SummaryApi.removeMember.method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clubId, userId: member._id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        onConfirm(member._id); // notify parent to update UI
+        onClose(); // close modal
+      } else console.error(data.message);
+    } catch (err) {
+      console.error("Failed to remove member.", err);
+    } finally {
+      setShowLoader(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -20,10 +45,11 @@ const RemoveMemberModal = ({ member, onClose, onConfirm }) => {
             Cancel
           </button>
           <button
-            onClick={() => onConfirm(member._id)}
+            onClick={removeMember}
             className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white"
+            disabled={showLoader}
           >
-            Remove
+            {showLoader ? "Removing..." : "Remove"}
           </button>
         </div>
       </div>
