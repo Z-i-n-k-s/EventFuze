@@ -4,6 +4,8 @@ async function addMilestone(req, res) {
   try {
     const { clubId, title, description, date, image } = req.body;
 
+    console.log(req.body)
+
     if (!clubId || !title) {
       return res.status(400).json({ message: "clubId and title are required", success: false, error: true });
     }

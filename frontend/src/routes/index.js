@@ -25,6 +25,7 @@ import RegisterEvent from "../pages/user/RegisterEvent";
 import MyEvents from "../pages/user/MyEvents";
 import ClubDetails from "../pages/user/ClubDetails";
 import JoinForm from "../components/user/JoinForm";
+import ClubMilstones from "../pages/Club-Admin/ClubMilstones";
 
 // Redirect component for root path
 const RootRedirect = () => {
@@ -185,6 +186,14 @@ const router = createBrowserRouter([
             element: (
               <ProtectedRoute allowedRoles={["CLUB_ADMIN"]}>
                 <ClubDashboard />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "club-milestones",
+            element: (
+              <ProtectedRoute allowedRoles={["CLUB_ADMIN"]}>
+                <ClubMilstones />
               </ProtectedRoute>
             ),
           },

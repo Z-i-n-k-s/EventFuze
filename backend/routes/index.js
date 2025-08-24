@@ -40,6 +40,7 @@ const getRegistrationsByEvent = require('../controller/Register/getRegistrations
 const getRegistrationsByStudent = require('../controller/Register/getRegistrationsByStudent')
 const uploadCertificate = require('../controller/Register/uploadCertificate')
 const leaveClub = require('../controller/Club/leaveClub')
+const getMilestonesByClubId = require('../controller/Club/getMilestonesByClubId')
 
 
 router.post("/signup",userSignUpController)
@@ -71,6 +72,7 @@ router.post("/create-club", authToken, createClub);       // create new club
 router.post("/update-club", authToken, updateClub);       // update club by clubId in body
 router.post("/delete-club", authToken, deleteClub);       // delete club by clubId in body
 
+router.post("/get-milestones", getMilestonesByClubId);
 router.post("/add-milestone", authToken, addMilestone);
 router.post("/update-milestone", authToken, updateMilestone);
 router.post("/delete-milestone", authToken, deleteMilestone);
