@@ -199,7 +199,7 @@ const AllEvents = () => {
   style={{ backgroundImage: `url(${image1})` }}
 >
   {/* Darker overlay for better text contrast */}
-  <div className="absolute inset-0 bg-black/80" />
+  <div className="absolute inset-0 bg-black/70" />
 
   <motion.div
     className="relative z-10 text-center"

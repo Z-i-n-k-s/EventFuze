@@ -1,17 +1,11 @@
 import { motion } from "framer-motion";
-import { Calendar, CheckCircle, Clock, TrendingUp, Users, XCircle } from 'lucide-react';
+import { Calendar, TrendingUp, Users } from 'lucide-react';
 import React from 'react';
-import { getEventStatus } from '../../../helpers/eventStatusHelper';
 
 const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
-  // Calculate additional metrics from the events data
-  const completedEvents = events?.filter(e => getEventStatus(e) === 'completed').length || 0;
-  const cancelledEvents = events?.filter(e => getEventStatus(e) === 'cancelled').length || 0;
-  const ongoingEvents = events?.filter(e => getEventStatus(e) === 'ongoing').length || 0;
-  
-  // Calculate average registration rate
+  // Calculate average capacity
   const totalCapacity = events?.reduce((sum, event) => sum + (event.maxParticipants || 0), 0) || 1;
-  const registrationRate = totalCapacity > 0 ? Math.round((totalRegistrations / totalCapacity) * 100) : 0;
+  const averageCapacity = totalEvents > 0 ? Math.round(totalCapacity / totalEvents) : 0;
   
   // Calculate revenue from paid events
   const totalRevenue = events?.reduce((sum, event) => {
@@ -36,10 +30,10 @@ const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
       gradient: "from-blue-500 to-blue-600"
     },
     {
-      title: "Active Registrations", 
+      title: "Total Registration", 
       value: totalRegistrations.toLocaleString(),
-      change: `${registrationRate}% fill rate`,
-      changeColor: registrationRate >= 70 ? "text-green-600" : registrationRate >= 50 ? "text-yellow-600" : "text-red-600",
+      change: "All events",
+      changeColor: "text-green-600",
       icon: Users,
       iconBg: "bg-green-50",
       iconColor: "text-green-600", 
@@ -54,13 +48,23 @@ const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
       iconBg: "bg-purple-50", 
       iconColor: "text-purple-600",
       gradient: "from-purple-500 to-purple-600"
+    },
+    {
+      title: "Average Capacity",
+      value: averageCapacity,
+      change: "Per event",
+      changeColor: "text-orange-600",
+      icon: Users,
+      iconBg: "bg-orange-50",
+      iconColor: "text-orange-600",
+      gradient: "from-orange-500 to-orange-600"
     }
   ];
 
   return (
     <div className="space-y-6">
-      {/* Main Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Main Stats Cards - 4 cards in a row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {cards.map((card, index) => {
           const Icon = card.icon;
           return (
@@ -99,6 +103,7 @@ const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
           );
         })}
       </div>
+
 
       {/* Secondary Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -176,6 +181,7 @@ const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
           </div>
         </motion.div>
       </div>
+
     </div>
   );
 };

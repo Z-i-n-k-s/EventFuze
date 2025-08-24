@@ -86,7 +86,7 @@ const SummaryApi = {
     method: "post",
   },
   getAllMilestones: {
-    url: `${backendDomain}/api/all-milestones`,
+    url: `${backendDomain}/api/get-milestones`,
     method: "post",
   },
 
@@ -129,7 +129,7 @@ const SummaryApi = {
   },
   updateEvent: {
     url: `${backendDomain}/api/update-event`,
-    method: "put",
+    method: "post",
   },
   deleteEvent: {
     url: `${backendDomain}/api/delete-event`,
