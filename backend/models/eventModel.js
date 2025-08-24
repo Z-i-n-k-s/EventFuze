@@ -26,7 +26,7 @@ const eventSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Registration fee cannot be negative"],
     },
-    currency: { type: String, default: "USD" },
+    currency: { type: String, default: "BDT" },
     // Registration period
     registrationStart: { type: Date, required: true },
     registrationDeadline: { type: Date, required: true },

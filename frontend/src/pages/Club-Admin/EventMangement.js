@@ -1,29 +1,40 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { FaPlus } from "react-icons/fa";
 import { toast } from "react-toastify";
+import CreateEvent from "../../components/subAdmin/CreateEvent";
 import EditDetails from "../../components/subAdmin/EditDetails";
 import { getEventStatus, getStatusBadgeConfig } from "../../helpers/eventStatusHelper";
-import { eventService } from "../../services/eventService";
+
+import SummaryApi from "../../common";
 
 const EventManagement = () => {
   const [events, setEvents] = useState([]);
 
   // Fetch events from backend
   const fetchEvents = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await eventService.getAllEvents();
-      if (response.success) {
-        setEvents(response.data);
-      } else {
-        toast.error(response.message || 'Failed to fetch events');
-      }
-    } catch (error) {
-      console.error('Error fetching events:', error);
-      toast.error('Failed to fetch events from server');
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    const response = await fetch(SummaryApi.getAllEvents.url, {
+      method: SummaryApi.getAllEvents.method,
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setEvents(data.data);
+    } else {
+      toast.error(data.message || "Failed to fetch events");
     }
-  }, []);
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    toast.error("Failed to fetch events from server");
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
 
   useEffect(() => {
     fetchEvents();
@@ -34,6 +45,7 @@ const EventManagement = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [editingEvent, setEditingEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [creatingEvent, setCreatingEvent] = useState(false);
 
   // Filter events based on status and search term
   const filteredEvents = events.filter((event) => {
@@ -46,22 +58,30 @@ const EventManagement = () => {
     return matchesFilter && matchesSearch;
   });
 
-  // Function to handle event deletion
-  const handleDeleteEvent = async (id) => {
-    try {
-      const response = await eventService.deleteEvent(id);
-      if (response.success) {
-        setEvents(events.filter((event) => event._id !== id));
-        setDeleteConfirm(null);
-        toast.success("Event deleted successfully!");
-      } else {
-        toast.error(response.message || 'Failed to delete event');
-      }
-    } catch (error) {
-      console.error('Error deleting event:', error);
-      toast.error('Failed to delete event');
+const handleDeleteEvent = async (id) => {
+  try {
+    const response = await fetch(SummaryApi.deleteEvent.url, {
+      method: SummaryApi.deleteEvent.method,
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }, // <-- important
+      body: JSON.stringify({ eventId: id }),
+    });
+
+    const data = await response.json(); // parse the JSON
+
+    if (response.ok) {
+      setEvents(events.filter((event) => event._id !== id));
+      setDeleteConfirm(null);
+      toast.success('Event deleted successfully!');
+    } else {
+      toast.error(data.message || 'Failed to delete event');
     }
-  };
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    toast.error('Failed to delete event');
+  }
+};
+
 
   // Function to toggle certificate provision
   const toggleCertificate = (id) => {
@@ -81,25 +101,15 @@ const EventManagement = () => {
     return config.color;
   };
 
-  // Function to handle event update after editing
-  const handleEventUpdate = async (updatedEvent) => {
-    try {
-      const response = await eventService.updateEvent(updatedEvent);
-      if (response.success) {
-        setEvents(
-          events.map((event) =>
-            event._id === updatedEvent._id ? response.data : event
-          )
-        );
-        setEditingEvent(null);
-        toast.success("Event updated successfully!");
-      } else {
-        toast.error(response.message || 'Failed to update event');
-      }
-    } catch (error) {
-      console.error('Error updating event:', error);
-      toast.error('Failed to update event');
-    }
+
+
+  //Handle saving create event
+  const handleCreateEvent = (newEvent) => {
+    setEvents(prevEvents => [
+      ...prevEvents,
+      { ...newEvent, id: prevEvents.length + 1 } // auto-generate id
+    ]);
+    setCreatingEvent(false);
   };
 
   return (
@@ -127,23 +137,35 @@ const EventManagement = () => {
       </div>
 
       {/* Filter buttons */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {["all", "upcoming", "ongoing", "completed"].map((status) => (
-          <button
-            key={status}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              filter === status
-                ? "bg-green-700 text-white"
-                : "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600"
-            }`}
-            onClick={() => setFilter(status)}
-          >
-            {status === "all"
-              ? "All Events"
-              : status.charAt(0).toUpperCase() + status.slice(1)}
-          </button>
-        ))}
-      </div>
+      {/* Filter buttons + Create button */}
+<div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-6 gap-2">
+  {/* Filter buttons */}
+  <div className="flex flex-wrap gap-2">
+    {["all", "upcoming", "ongoing", "completed"].map((status) => (
+      <button
+        key={status}
+        className={`px-4 py-2 rounded-lg transition-colors ${
+          filter === status
+            ? "bg-green-700 text-white"
+            : "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600"
+        }`}
+        onClick={() => setFilter(status)}
+      >
+        {status === "all"
+          ? "All Events"
+          : status.charAt(0).toUpperCase() + status.slice(1)}
+      </button>
+    ))}
+  </div>
+
+  {/* Create New Event Button */}
+  <button 
+              className="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center"
+              onClick={() => setCreatingEvent(true)} // ✅ open modal
+            >
+              <FaPlus className="mr-2" /> Create New Event
+            </button>
+</div>
 
       {/* Events Grid */}
       {loading ? (
@@ -334,7 +356,13 @@ const EventManagement = () => {
         <EditDetails
           event={editingEvent}
           onClose={() => setEditingEvent(null)}
-          onSave={handleEventUpdate}
+          onSave={fetchEvents}
+        />
+      )}
+      {creatingEvent && (
+        <CreateEvent 
+          onSave={handleCreateEvent} 
+          onClose={() => setCreatingEvent(false)}
         />
       )}
     </div>

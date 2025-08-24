@@ -60,7 +60,10 @@ async function createEvent(req, res) {
       images: images || [],
       createdBy,
       registrationFee: registrationFee || 0,
-      currency: currency || "USD",
+
+
+      currency: currency || "BDT",
+
       registrationStart,
       registrationDeadline,
     });
