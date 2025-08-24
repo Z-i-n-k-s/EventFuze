@@ -32,7 +32,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50/30 to-gray-50 px-4">
+    <section className="min-h-screen flex items-center justify-center bg-green-100 dark:bg-slate-900 px-4">
       <div className="bg-white/90 backdrop-blur-md shadow-xl rounded-2xl p-8 w-full max-w-md">
         
         {/* Icon */}
@@ -61,7 +61,7 @@ const ForgotPassword = () => {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-amber-400 focus:bg-white transition-all"
+              className="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-green-900 focus:bg-white transition-all dark:text-black"
               required
             />
           </div>
@@ -69,7 +69,7 @@ const ForgotPassword = () => {
           {/* Button */}
           <button
             type="submit"
-            className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 rounded-full transition-transform transform hover:scale-105 shadow-md"
+            className="bg-green-600 hover:bg-green-900 text-white font-semibold py-3 rounded-full transition-transform transform hover:scale-105 shadow-md"
           >
             Send Reset Link
           </button>
@@ -78,7 +78,7 @@ const ForgotPassword = () => {
         {/* Back to login */}
         <p className="text-center text-gray-600 mt-6">
           Remembered your password?{" "}
-          <Link to="/login" className="text-amber-600 hover:underline font-medium">
+          <Link to="/login" className="text-green-900 hover:underline font-medium">
             Back to Login
           </Link>
         </p>

@@ -9,7 +9,6 @@ import {
   FaEye,
   FaEdit
 } from 'react-icons/fa';
-
 import EditDetails from '../../components/subAdmin/EditDetails';
 import ViewEventDet from '../../components/subAdmin/ViewEventDet';
 
