@@ -1,34 +1,32 @@
-import { AlertCircle, Calendar, Clock, DollarSign, Image, MapPin, Save, Users, X } from 'lucide-react';
-import React, { useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import SummaryApi from '../../common';
-import Context from '../../context';
+import { AlertCircle, Calendar, Clock, DollarSign, Image, MapPin, Save, Users, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import SummaryApi from "../../common";
 
-const EditDetails = ({ event, onClose, onSave }) => {
+const CreateEvent = ({ onSave, onClose }) => {
   const user = useSelector((state) => state?.user?.user);
-  const { fetchUserDetails } = useContext(Context);
   const [clubs, setClubs] = useState([]);
   const [userClub, setUserClub] = useState(null);
   const [loading, setLoading] = useState(false);
   
-  const [editedEvent, setEditedEvent] = useState({
-    title: event.title || "",
-    description: event.description || "",
-    category: event.category || "",
-    date: event.date ? new Date(event.date).toISOString().split('T')[0] : "",
-    startTime: event.startTime || "",
-    endTime: event.endTime || "",
-    location: event.location || "",
-    maxParticipants: event.maxParticipants || 100,
-    clubsId: event.clubsId || [],
-    images: event.images || [],
-    registrationFee: event.registrationFee || 0,
-    registrationStart: event.registrationStart ? new Date(event.registrationStart).toISOString().split('T')[0] : "",
-    registrationDeadline: event.registrationDeadline ? new Date(event.registrationDeadline).toISOString().split('T')[0] : "",
+  const [newEvent, setNewEvent] = useState({
+    title: "",
+    description: "",
+    category: "",
+    date: "",
+    startTime: "",
+    endTime: "",
+    location: "",
+    maxParticipants: 100,
+    clubsId: [],
+    images: [],
+    registrationFee: 0,
+    registrationStart: "",
+    registrationDeadline: "",
   });
   
-  const [imagePreview, setImagePreview] = useState(event.images && event.images.length > 0 ? event.images[0] : null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
 
   // Fetch clubs and find the user's club
@@ -44,6 +42,7 @@ const EditDetails = ({ event, onClose, onSave }) => {
           setClubs(data.data || []);
           
           // Find the club where the current user is a club admin
+          // Check if user has clubs array and find the club where they are admin
           let userClubData = null;
           
           if (user.clubs && user.clubs.length > 0) {
@@ -67,8 +66,12 @@ const EditDetails = ({ event, onClose, onSave }) => {
           
           if (userClubData) {
             setUserClub(userClubData);
+            setNewEvent(prev => ({
+              ...prev,
+              clubsId: [userClubData._id]
+            }));
           } else {
-            toast.error("You are not authorized to edit events for any club");
+            toast.error("You are not authorized to create events for any club");
             onClose();
           }
         } else {
@@ -86,9 +89,9 @@ const EditDetails = ({ event, onClose, onSave }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditedEvent(prev => ({
+    setNewEvent((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     
     // Clear error when user starts typing
@@ -124,7 +127,7 @@ const EditDetails = ({ event, onClose, onSave }) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setEditedEvent(prev => ({
+        setNewEvent((prev) => ({
           ...prev,
           images: [reader.result]
         }));
@@ -140,60 +143,64 @@ const EditDetails = ({ event, onClose, onSave }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!editedEvent.title.trim()) {
+    if (!newEvent.title.trim()) {
       newErrors.title = "Event title is required";
     }
     
-    if (!editedEvent.description.trim()) {
+    if (!newEvent.description.trim()) {
       newErrors.description = "Event description is required";
     }
     
-    if (!editedEvent.category.trim()) {
+    if (!newEvent.category.trim()) {
       newErrors.category = "Event category is required";
     }
     
-    if (!editedEvent.date) {
+    if (!newEvent.date) {
       newErrors.date = "Event date is required";
     }
     
-    if (!editedEvent.startTime) {
+    if (!newEvent.startTime) {
       newErrors.startTime = "Start time is required";
     }
     
-    if (!editedEvent.endTime) {
+    if (!newEvent.endTime) {
       newErrors.endTime = "End time is required";
     }
     
-    if (!editedEvent.location.trim()) {
+    if (!newEvent.location.trim()) {
       newErrors.location = "Event location is required";
     }
     
-    if (editedEvent.maxParticipants <= 0) {
+    if (newEvent.maxParticipants <= 0) {
       newErrors.maxParticipants = "Maximum participants must be greater than 0";
     }
     
-    if (editedEvent.registrationFee < 0) {
+    if (!newEvent.clubsId.length) {
+      newErrors.clubsId = "Club is required";
+    }
+    
+    if (newEvent.registrationFee < 0) {
       newErrors.registrationFee = "Registration fee cannot be negative";
     }
     
-    if (!editedEvent.registrationStart) {
+    if (!newEvent.registrationStart) {
       newErrors.registrationStart = "Registration start date is required";
     }
     
-    if (!editedEvent.registrationDeadline) {
+    if (!newEvent.registrationDeadline) {
       newErrors.registrationDeadline = "Registration deadline is required";
     }
     
     // Validate registration dates
-    if (editedEvent.registrationStart && editedEvent.registrationDeadline) {
-      if (new Date(editedEvent.registrationDeadline) < new Date(editedEvent.registrationStart)) {
+    if (newEvent.registrationStart && newEvent.registrationDeadline) {
+      if (new Date(newEvent.registrationDeadline) < new Date(newEvent.registrationStart)) {
         newErrors.registrationDeadline = "Registration deadline cannot be before registration start date";
       }
     }
     
     // Validate event date is not in the past
-    if (editedEvent.date) {
-      const eventDate = new Date(editedEvent.date);
+    if (newEvent.date) {
+      const eventDate = new Date(newEvent.date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       if (eventDate < today) {
@@ -214,38 +221,17 @@ const EditDetails = ({ event, onClose, onSave }) => {
     
     setLoading(true);
     
-    // Check if user is authenticated
-    if (!user || !user._id) {
-      toast.error("User not authenticated. Please log in again.");
-      window.location.href = '/login';
-      return;
-    }
-    
-
-    
     try {
       // Prepare event data for backend
       const eventData = {
-        eventId: event._id,
-        title: editedEvent.title,
-        description: editedEvent.description,
-        category: editedEvent.category,
-        date: editedEvent.date,
-        startTime: editedEvent.startTime,
-        endTime: editedEvent.endTime,
-        location: editedEvent.location,
-        maxParticipants: parseInt(editedEvent.maxParticipants),
-        clubsId: editedEvent.clubsId,
-        images: editedEvent.images,
-        registrationFee: parseFloat(editedEvent.registrationFee),
-        registrationStart: editedEvent.registrationStart,
-        registrationDeadline: editedEvent.registrationDeadline,
+        ...newEvent,
+        createdBy: user._id, // Add the club admin ID
+        maxParticipants: parseInt(newEvent.maxParticipants),
+        registrationFee: parseFloat(newEvent.registrationFee),
       };
 
-
-      
-      const response = await fetch(SummaryApi.updateEvent.url, {
-        method: SummaryApi.updateEvent.method,
+      const response = await fetch(SummaryApi.createEvent.url, {
+        method: SummaryApi.createEvent.method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -256,52 +242,36 @@ const EditDetails = ({ event, onClose, onSave }) => {
       const data = await response.json();
 
       if (data.success) {
-        toast.success("Event updated successfully!");
+        toast.success("Event created successfully!");
         if (onSave) {
           onSave(data.data);
         }
+        
+        // Reset form
+    setNewEvent({
+      title: "",
+          description: "",
+      category: "",
+      date: "",
+          startTime: "",
+          endTime: "",
+      location: "",
+          maxParticipants: 100,
+          clubsId: userClub ? [userClub._id] : [],
+          images: [],
+          registrationFee: 0,
+          registrationStart: "",
+          registrationDeadline: "",
+    });
+    setImagePreview(null);
+        setErrors({});
         onClose();
       } else {
-        // Handle authentication errors silently
-        if (data.message && (data.message.includes("LogIn") || data.message.includes("Please log in"))) {
-          // Try to refresh user session silently
-          try {
-            await fetchUserDetails();
-            
-            // Retry the update after refreshing session
-            const retryResponse = await fetch(SummaryApi.updateEvent.url, {
-              method: SummaryApi.updateEvent.method,
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials: "include",
-              body: JSON.stringify(eventData),
-            });
-
-            const retryData = await retryResponse.json();
-
-            if (retryData.success) {
-              toast.success("Event updated successfully!");
-              if (onSave) {
-                onSave(retryData.data);
-              }
-              onClose();
-              return;
-            } else {
-              // Silent redirect to login page
-              window.location.href = '/login';
-            }
-          } catch (refreshError) {
-            // Silent redirect to login page
-            window.location.href = '/login';
-          }
-        } else {
-          toast.error(data.message || "Failed to update event");
-        }
+        toast.error(data.message || "Failed to create event");
       }
     } catch (error) {
-      console.error("Error updating event:", error);
-      toast.error("Failed to update event. Please try again.");
+      console.error("Error creating event:", error);
+      toast.error("Failed to create event. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -317,7 +287,7 @@ const EditDetails = ({ event, onClose, onSave }) => {
               Access Denied
             </h3>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              You are not authorized to edit events. Only club admins can edit events.
+              You are not authorized to create events. Only club admins can create events.
             </p>
             <button
               onClick={onClose}
@@ -339,18 +309,18 @@ const EditDetails = ({ event, onClose, onSave }) => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Edit Event Details
-              </h2>
+        Create New Event
+      </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Editing event for: <span className="font-semibold text-blue-600">{userClub.name}</span>
+                Creating event for: <span className="font-semibold text-blue-600">{userClub.name}</span>
               </p>
             </div>
-          <button
-            onClick={onClose}
+            <button
+              onClick={onClose}
               className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-          >
+            >
               <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-          </button>
+            </button>
           </div>
         </div>
 
@@ -361,12 +331,12 @@ const EditDetails = ({ event, onClose, onSave }) => {
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Event Title *
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={editedEvent.title}
-                onChange={handleInputChange}
+            </label>
+            <input
+              type="text"
+              name="title"
+              value={newEvent.title}
+              onChange={handleInputChange}
                 placeholder="Enter event title"
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                           dark:bg-slate-700 dark:text-white transition-colors ${
@@ -381,17 +351,17 @@ const EditDetails = ({ event, onClose, onSave }) => {
                   {errors.title}
                 </p>
               )}
-            </div>
+          </div>
 
             {/* Description */}
-            <div>
+          <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Event Description *
-              </label>
+            </label>
               <textarea
                 name="description"
-                value={editedEvent.description}
-                onChange={handleInputChange}
+                value={newEvent.description}
+              onChange={handleInputChange}
                 rows="4"
                 placeholder="Describe your event in detail..."
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
@@ -407,19 +377,19 @@ const EditDetails = ({ event, onClose, onSave }) => {
                   {errors.description}
                 </p>
               )}
-            </div>
+          </div>
 
             {/* Category and Club Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
+          <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Category *
-              </label>
+            </label>
                 <input
                   type="text"
-                name="category"
-                value={editedEvent.category}
-                onChange={handleInputChange}
+              name="category"
+              value={newEvent.category}
+              onChange={handleInputChange}
                   placeholder="Enter event category"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                             dark:bg-slate-700 dark:text-white transition-colors ${
@@ -448,23 +418,23 @@ const EditDetails = ({ event, onClose, onSave }) => {
                            bg-gray-100 dark:bg-slate-600 text-gray-700 dark:text-gray-300 cursor-not-allowed"
                 />
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Club cannot be changed - automatically selected based on your club admin role
+                  Automatically selected based on your club admin role
                 </p>
               </div>
-            </div>
+          </div>
 
             {/* Event Date and Time Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
+          <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                <Calendar className="inline h-4 w-4 mr-1" />
+              <Calendar className="inline h-4 w-4 mr-1" />
                   Event Date *
-              </label>
-              <input
-                type="date"
-                name="date"
-                value={editedEvent.date}
-                onChange={handleInputChange}
+            </label>
+            <input
+              type="date"
+              name="date"
+              value={newEvent.date}
+              onChange={handleInputChange}
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                             dark:bg-slate-700 dark:text-white transition-colors ${
                               errors.date 
@@ -488,7 +458,7 @@ const EditDetails = ({ event, onClose, onSave }) => {
                 <input
                   type="time"
                   name="startTime"
-                  value={editedEvent.startTime}
+                  value={newEvent.startTime}
                   onChange={handleInputChange}
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                             dark:bg-slate-700 dark:text-white transition-colors ${
@@ -503,18 +473,18 @@ const EditDetails = ({ event, onClose, onSave }) => {
                     {errors.startTime}
                   </p>
                 )}
-            </div>
+          </div>
 
-            <div>
+          <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                <Clock className="inline h-4 w-4 mr-1" />
+              <Clock className="inline h-4 w-4 mr-1" />
                   End Time *
-              </label>
-              <input
+            </label>
+            <input
                   type="time"
                   name="endTime"
-                  value={editedEvent.endTime}
-                onChange={handleInputChange}
+                  value={newEvent.endTime}
+              onChange={handleInputChange}
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                             dark:bg-slate-700 dark:text-white transition-colors ${
                               errors.endTime 
@@ -529,20 +499,20 @@ const EditDetails = ({ event, onClose, onSave }) => {
                   </p>
                 )}
               </div>
-            </div>
+          </div>
 
             {/* Location and Max Participants Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                <MapPin className="inline h-4 w-4 mr-1" />
+              <MapPin className="inline h-4 w-4 mr-1" />
                   Event Location *
-              </label>
-              <input
-                type="text"
-                name="location"
-                value={editedEvent.location}
-                onChange={handleInputChange}
+            </label>
+            <input
+              type="text"
+              name="location"
+              value={newEvent.location}
+              onChange={handleInputChange}
                   placeholder="Enter event location"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                             dark:bg-slate-700 dark:text-white transition-colors ${
@@ -557,17 +527,17 @@ const EditDetails = ({ event, onClose, onSave }) => {
                     {errors.location}
                   </p>
                 )}
-            </div>
+          </div>
 
-            <div>
+          <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                <Users className="inline h-4 w-4 mr-1" />
+              <Users className="inline h-4 w-4 mr-1" />
                   Maximum Participants *
-              </label>
+                </label>
                 <input
                   type="number"
                   name="maxParticipants"
-                  value={editedEvent.maxParticipants}
+                  value={newEvent.maxParticipants}
                   onChange={handleInputChange}
                   min="1"
                   placeholder="Enter maximum number of participants"
@@ -584,21 +554,21 @@ const EditDetails = ({ event, onClose, onSave }) => {
                     {errors.maxParticipants}
                   </p>
                 )}
-                </div>
               </div>
+            </div>
 
             {/* Registration Fee */}
-            <div>R̥
+            <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 <DollarSign className="inline h-4 w-4 mr-1" />
                 Registration Fee
-              </label>
-              <input
-                type="number"
+            </label>
+            <input
+              type="number"
                 name="registrationFee"
-                value={editedEvent.registrationFee}
-                onChange={handleInputChange}
-                min="0"
+                value={newEvent.registrationFee}
+              onChange={handleInputChange}
+              min="0"
                 step="0.01"
                 placeholder="Enter registration fee (0 for free)"
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
@@ -626,7 +596,7 @@ const EditDetails = ({ event, onClose, onSave }) => {
                 <input
                   type="date"
                   name="registrationStart"
-                  value={editedEvent.registrationStart}
+                  value={newEvent.registrationStart}
                   onChange={handleInputChange}
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                             dark:bg-slate-700 dark:text-white transition-colors ${
@@ -651,7 +621,7 @@ const EditDetails = ({ event, onClose, onSave }) => {
                 <input
                   type="date"
                   name="registrationDeadline"
-                  value={editedEvent.registrationDeadline}
+                  value={newEvent.registrationDeadline}
                   onChange={handleInputChange}
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                             dark:bg-slate-700 dark:text-white transition-colors ${
@@ -667,18 +637,18 @@ const EditDetails = ({ event, onClose, onSave }) => {
                   </p>
                 )}
               </div>
-            </div>
+          </div>
 
-            {/* Image Upload */}
-            <div>
+          {/* Image Upload */}
+          <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                <Image className="inline h-4 w-4 mr-1" />
-                Event Image
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
+              <Image className="inline h-4 w-4 mr-1" />
+              Event Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                           dark:bg-slate-700 dark:text-white transition-colors text-sm ${
                             errors.images 
@@ -695,44 +665,44 @@ const EditDetails = ({ event, onClose, onSave }) => {
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Max file size: 5MB. Supported formats: JPG, PNG, GIF
               </p>
-            </div>
+          </div>
 
-            {/* Image Preview */}
-            {imagePreview && (
+          {/* Image Preview */}
+          {imagePreview && (
               <div className="flex justify-center">
                 <div className="relative">
-                <img
-                  src={imagePreview}
-                  alt="Event preview"
+              <img
+                src={imagePreview}
+                alt="Event preview"
                     className="h-48 w-auto object-cover rounded-lg border border-gray-300 dark:border-slate-600 shadow-sm"
                   />
                   <button
                     type="button"
                     onClick={() => {
                       setImagePreview(null);
-                      setEditedEvent(prev => ({ ...prev, images: [] }));
+                      setNewEvent(prev => ({ ...prev, images: [] }));
                     }}
                     className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-              </div>
-            )}
+            </div>
+          )}
 
-          {/* Action Buttons */}
+            {/* Action Buttons */}
             <div className="flex justify-end gap-4 pt-4 border-t border-gray-200 dark:border-slate-700">
-            <button
-              type="button"
-              onClick={onClose}
+              <button
+                type="button"
+                onClick={onClose}
                 disabled={loading}
                 className="px-6 py-3 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg 
                          hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors font-medium disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
+              >
+                Cancel
+              </button>
+          <button
+            type="submit"
                 disabled={loading}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
                          transition-colors font-medium flex items-center shadow-sm disabled:opacity-50"
@@ -740,22 +710,21 @@ const EditDetails = ({ event, onClose, onSave }) => {
                 {loading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Updating...
+                    Creating...
                   </>
                 ) : (
                   <>
-              <Save className="h-4 w-4 mr-2" />
-                    Update Event
+            <Save className="h-4 w-4 mr-2" />
+            Create Event
                   </>
                 )}
-            </button>
-          </div>
-        </form>
+          </button>
+        </div>
+      </form>
         </div>
       </div>
     </div>
   );
 };
 
-export default EditDetails;
-
+export default CreateEvent;
