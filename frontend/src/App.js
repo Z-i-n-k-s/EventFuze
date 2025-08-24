@@ -11,6 +11,7 @@ import { setUserDetails } from "./store/userSlice";
 import Footer from "./components/shared/Footer";
 import Header from "./components/shared/Header";
 
+
 function App() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.user?.user);
@@ -53,6 +54,7 @@ function App() {
   return (
     <Context.Provider value={{ fetchUserDetails }}>
       <ToastContainer />
+
       <div className="flex flex-col min-h-screen">
         {showHeader && <Header />}
 
@@ -60,8 +62,10 @@ function App() {
           <Outlet />
         </main>
 
+
         {showFooter && <Footer />}
       </div>
+
     </Context.Provider>
   );
 }
