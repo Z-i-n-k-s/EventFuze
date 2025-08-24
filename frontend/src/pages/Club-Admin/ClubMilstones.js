@@ -16,6 +16,10 @@ const ClubMilestones = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMilestone, setEditingMilestone] = useState(null);
 
+  // Delete confirmation modal states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [milestoneToDelete, setMilestoneToDelete] = useState(null);
+
   const user = useSelector((state) => state?.user?.user);
 
   // Get clubId
@@ -136,11 +140,58 @@ const ClubMilestones = () => {
     });
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="min-h-screen">
       <HeaderSummary onAddClick={() => setIsModalOpen(true)} />
-      <SearchFilters searchQuery={searchQuery} setSearchQuery={setSearchQuery} filter={filter} setFilter={setFilter} date={date} setDate={setDate} />
-      <MilestonesList milestones={filteredMilestones} onEdit={(m) => { setEditingMilestone(m); setIsModalOpen(true); }} onDelete={handleDeleteMilestone} />
-      {isModalOpen && <AddMilestoneModal milestone={editingMilestone} onClose={() => { setIsModalOpen(false); setEditingMilestone(null); }} onSave={handleSaveMilestone} />}
+      <SearchFilters
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        filter={filter}
+        setFilter={setFilter}
+        date={date}
+        setDate={setDate}
+      />
+      <MilestonesList
+        milestones={filteredMilestones}
+        onEdit={(m) => { setEditingMilestone(m); setIsModalOpen(true); }}
+        onDelete={(m) => { setMilestoneToDelete(m); setDeleteModalOpen(true); }}
+      />
+
+      {isModalOpen && (
+        <AddMilestoneModal
+          milestone={editingMilestone}
+          onClose={() => { setIsModalOpen(false); setEditingMilestone(null); }}
+          onSave={handleSaveMilestone}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-sm shadow-lg dark:shadow-slate-700 transition-colors duration-300">
+            <p className="text-gray-900 dark:text-white text-lg mb-6">
+              Are you sure you want to delete "{milestoneToDelete.title}"?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => { setDeleteModalOpen(false); setMilestoneToDelete(null); }}
+                className="px-4 py-2 bg-gray-300 dark:bg-slate-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-slate-500 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleDeleteMilestone(milestoneToDelete._id);
+                  setDeleteModalOpen(false);
+                  setMilestoneToDelete(null);
+                }}
+                className="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-600 transition"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -45,8 +45,8 @@ const AddMilestoneModal = ({ onClose, onSave, milestone }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-md relative">
-        <h2 className="text-xl font-semibold mb-4">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-md relative shadow-lg dark:shadow-slate-700 transition-colors duration-300">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
           {milestone ? "Edit Milestone" : "Add Milestone"}
         </h2>
 
@@ -55,21 +55,21 @@ const AddMilestoneModal = ({ onClose, onSave, milestone }) => {
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 border rounded-lg mb-3 outline-none"
+          className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-lg mb-3 outline-none bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-400"
         />
 
         <textarea
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full p-2 border rounded-lg mb-3 outline-none resize-none"
+          className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-lg mb-3 outline-none resize-none bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-400"
         />
 
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full p-2 border rounded-lg mb-3 outline-none"
+          className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-lg mb-3 outline-none bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200"
         />
 
         <div className="mb-3">
@@ -78,27 +78,35 @@ const AddMilestoneModal = ({ onClose, onSave, milestone }) => {
               <img
                 src={preview}
                 alt="Preview"
-                className="w-full h-48 object-cover rounded mb-2"
+                className="w-full h-48 object-cover rounded mb-2 shadow-sm dark:shadow-slate-700"
               />
               <button
                 type="button"
                 onClick={removeImage}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full px-2 py-1"
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full px-2 py-1 hover:bg-red-600 transition"
               >
                 X
               </button>
             </div>
           )}
-          <input type="file" accept="image/*" onChange={handleImageSelect} />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageSelect}
+            className="text-gray-700 dark:text-gray-300"
+          />
         </div>
 
         <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded-lg">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-300 dark:bg-slate-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-slate-500 transition"
+          >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+            className="px-4 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-500 transition"
           >
             Save
           </button>

@@ -190,15 +190,15 @@ const totalEvents = events.length;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen ">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-green-600">
               Club Management
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className=" mt-1">
               Manage and organize all your clubs
             </p>
           </div>
@@ -223,7 +223,7 @@ const totalEvents = events.length;
         />
 
         {/* Search */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div >
           <div className="relative">
             <input
               type="text"

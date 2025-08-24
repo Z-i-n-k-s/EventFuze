@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import { FaUserLarge } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import SummaryApi from "../../common";
 import { toast } from "react-toastify";
@@ -41,7 +41,7 @@ const Header = () => {
         });
         const data = await response.json();
         if (data.success) {
-          setClubs(data.data || []); // Updated to use data.data based on your API response
+          setClubs(data.data || []);
         } else {
           toast.error(data.message || "Failed to fetch clubs");
         }
@@ -74,25 +74,22 @@ const Header = () => {
 
   // Function to handle club navigation with data
   const handleClubNavigation = (club) => {
-    navigate(`/clubs/${club._id}`, { 
-      state: { 
-        clubData: club 
-      } 
+    navigate(`/clubs/${club._id}`, {
+      state: {
+        clubData: club,
+      },
     });
     setClubsDropdown(false);
     setMobileMenuOpen(false);
   };
 
-  const isActive = (path) => location.pathname === path;
-
-  const navigationLinks = [
-    { path: "/", label: "Home" },
-    { path: "/events", label: "Events" },
-  ];
+  // For styling "Clubs ▼" as active when on any /clubs/* route (basename-safe)
+  const clubsTopActive =
+    location.pathname.includes("/clubs/") || location.pathname.endsWith("/clubs");
 
   return (
     <>
-      <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm sticky top-0 z-40 font-inter text-[15px]">
+      <header className="h-16 shadow-xl bg-gray-200 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm sticky top-0 z-40 font-inter text-[15px]">
         <div className="h-full container mx-auto flex items-center px-4 lg:px-6 justify-between max-w-7xl">
           {/* Logo Section */}
           <Link to="/" className="flex items-center">
@@ -103,28 +100,39 @@ const Header = () => {
           <div className="hidden lg:flex items-center gap-6">
             {/* Navigation Links */}
             <nav className="flex items-center gap-6 relative">
-              {navigationLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path === "/events" ? "/all-events" : link.path}
-                  className={`font-medium transition-colors duration-200 ${
-                    isActive(
-                      link.path === "/events" ? "/all-events" : link.path
-                    )
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) =>
+                  `font-medium transition-colors duration-200 ${
+                    isActive
                       ? "text-green-600 dark:text-green-400"
                       : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+                  }`
+                }
+              >
+                Home
+              </NavLink>
+
+              <NavLink
+                to="/all-events"
+                className={({ isActive }) =>
+                  `font-medium transition-colors duration-200 ${
+                    isActive
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400"
+                  }`
+                }
+              >
+                Events
+              </NavLink>
 
               {/* Clubs Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setClubsDropdown((prev) => !prev)}
                   className={`font-medium transition-colors duration-200 flex items-center gap-1 ${
-                    location.pathname.startsWith("/clubs")
+                    clubsTopActive
                       ? "text-green-600 dark:text-green-400"
                       : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400"
                   }`}
@@ -143,17 +151,21 @@ const Header = () => {
                     {/* Desktop Clubs Dropdown */}
                     <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden z-40">
                       {clubs.map((club) => (
-                        <button
+                        <NavLink
                           key={club._id}
-                          onClick={() => handleClubNavigation(club)}
-                          className={`w-full text-left block px-5 py-3 text-[15px] border-b last:border-b-0 border-slate-200 dark:border-slate-700 transition-colors duration-200 ${
-                            location.pathname === `/clubs/${club._id}`
-                              ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
-                              : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-900/20"
-                          }`}
+                          to={`/clubs/${club._id}`}
+                          state={{ clubData: club }}
+                          onClick={() => setClubsDropdown(false)}
+                          className={({ isActive }) =>
+                            `w-full text-left block px-5 py-3 text-[15px] border-b last:border-b-0 border-slate-200 dark:border-slate-700 transition-colors duration-200 ${
+                              isActive
+                                ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                                : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-900/20"
+                            }`
+                          }
                         >
                           {club.name}
-                        </button>
+                        </NavLink>
                       ))}
                     </div>
                   </>
@@ -223,40 +235,63 @@ const Header = () => {
                           <FaUserCog className="w-4 h-4" />
                           <span className="font-medium">Profile Settings</span>
                         </button>
-                        <Link
+                        <NavLink
                           to="/my-events"
-                          className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
+                          className={({ isActive }) =>
+                            `w-full flex items-center gap-3 px-4 py-3 transition-colors duration-150 ${
+                              isActive
+                                ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                                : "text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                            }`
+                          }
                           onClick={() => setMenuDisplay(false)}
                         >
                           📅 <span className="font-medium">My Events</span>
-                        </Link>
-                        <Link
+                        </NavLink>
+                        <NavLink
                           to="/register-event"
-                          className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
+                          className={({ isActive }) =>
+                            `w-full flex items-center gap-3 px-4 py-3 transition-colors duration-150 ${
+                              isActive
+                                ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                                : "text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                            }`
+                          }
                           onClick={() => setMenuDisplay(false)}
                         >
-                          ✅{" "}
-                          <span className="font-medium">Registered Events</span>
-                        </Link>
+                          ✅ <span className="font-medium">Registered Events</span>
+                        </NavLink>
                         {user?.role === ROLE.SUPER_ADMIN && (
-                          <Link
+                          <NavLink
                             to="/admin-panel/all-users"
-                            className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
+                            className={({ isActive }) =>
+                              `w-full flex items-center gap-3 px-4 py-3 transition-colors duration-150 ${
+                                isActive
+                                  ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                                  : "text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                              }`
+                            }
                             onClick={() => setMenuDisplay(false)}
                           >
                             <FaCog className="w-4 h-4" />
                             <span className="font-medium">Admin Panel</span>
-                          </Link>
+                          </NavLink>
                         )}
                         {user?.role === ROLE.CLUB_ADMIN && (
-                          <Link
+                          <NavLink
                             to="/club-admin-panel/club-dashboard"
-                            className="w-full flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-150"
+                            className={({ isActive }) =>
+                              `w-full flex items-center gap-3 px-4 py-3 transition-colors duration-150 ${
+                                isActive
+                                  ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                                  : "text-slate-700 dark:text-slate-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                              }`
+                            }
                             onClick={() => setMenuDisplay(false)}
                           >
                             <FaCog className="w-4 h-4" />
                             <span className="font-medium">Club Panel</span>
-                          </Link>
+                          </NavLink>
                         )}
                         <div className="border-t border-slate-100 dark:border-slate-700 my-2"></div>
                         <button
@@ -283,7 +318,7 @@ const Header = () => {
                   Login
                 </Link>
                 <Link
-                  to="/signup"
+                  to="/sign-up"
                   className="px-5 py-2 rounded-xl text-green-600 border border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all font-medium"
                 >
                   Sign Up
@@ -320,49 +355,185 @@ const Header = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg z-30 font-inter text-[15px]">
-            <div className="container mx-auto px-4 py-4">
-              <nav className="flex flex-col gap-3 mb-4">
-                <Link
+            <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
+              {/* User Section in Mobile */}
+              {user?._id ? (
+                <div className="flex flex-col gap-2 border-b border-slate-200 dark:border-slate-700 pb-4">
+                  <div className="flex items-center gap-3">
+                    {user?.profilePic ? (
+                      <img
+                        src={user?.profilePic}
+                        alt={user?.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+                        <FaUserLarge className="w-5 h-5 text-white" />
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-semibold text-slate-900 dark:text-slate-200">
+                        {user?.name}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    className="text-left font-medium py-2 px-3 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setTimeout(() => setProfileDisplay(true), 100);
+                    }}
+                  >
+                    <FaUserCog className="inline-block mr-2" /> Profile Settings
+                  </button>
+
+                  <NavLink
+                    to="/my-events"
+                    className={({ isActive }) =>
+                      `text-left font-medium py-2 px-3 rounded-lg transition-colors ${
+                        isActive
+                          ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                          : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      }`
+                    }
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    📅 My Events
+                  </NavLink>
+
+                  <NavLink
+                    to="/register-event"
+                    className={({ isActive }) =>
+                      `text-left font-medium py-2 px-3 rounded-lg transition-colors ${
+                        isActive
+                          ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                          : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      }`
+                    }
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    ✅ Registered Events
+                  </NavLink>
+
+                  {user?.role === ROLE.SUPER_ADMIN && (
+                    <NavLink
+                      to="/admin-panel/all-users"
+                      className={({ isActive }) =>
+                        `text-left font-medium py-2 px-3 rounded-lg transition-colors ${
+                          isActive
+                            ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                            : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        }`
+                      }
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <FaCog className="inline-block mr-2" /> Admin Panel
+                    </NavLink>
+                  )}
+
+                  {user?.role === ROLE.CLUB_ADMIN && (
+                    <NavLink
+                      to="/club-admin-panel/club-dashboard"
+                      className={({ isActive }) =>
+                        `text-left font-medium py-2 px-3 rounded-lg transition-colors ${
+                          isActive
+                            ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                            : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        }`
+                      }
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <FaCog className="inline-block mr-2" /> Club Panel
+                    </NavLink>
+                  )}
+
+                  <button
+                    className="text-left font-medium py-2 px-3 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-700/30"
+                    onClick={() => {
+                      handelLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <FaSignOutAlt className="inline-block mr-2" /> Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-3 border-b border-slate-200 dark:border-slate-700 pb-4">
+                  <Link
+                    to="/login"
+                    className="px-5 py-2 rounded-xl text-white bg-green-600 hover:bg-green-700 transition-all font-medium shadow-sm w-full text-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="px-5 py-2 rounded-xl text-green-600 border border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all font-medium w-full text-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+
+              {/* Navigation Links */}
+              <nav className="flex flex-col gap-2">
+                <NavLink
                   to="/"
-                  className={`font-medium py-2 px-3 rounded-lg transition-colors duration-200 ${
-                    isActive("/")
-                      ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
-                      : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                  }`}
+                  end
+                  className={({ isActive }) =>
+                    `font-medium py-2 px-3 rounded-lg transition-colors duration-200 ${
+                      isActive
+                        ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
+                        : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    }`
+                  }
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Home
-                </Link>
+                </NavLink>
+
                 {/* Mobile Clubs Menu */}
                 <div className="flex flex-col gap-1">
                   <span className="font-medium px-3 py-2 text-slate-700 dark:text-slate-200">
                     Clubs
                   </span>
                   {clubs.map((club) => (
-                    <button
+                    <NavLink
                       key={club._id}
-                      onClick={() => handleClubNavigation(club)}
-                      className={`w-full text-left font-medium py-2 px-6 rounded-lg transition-colors duration-200 ${
-                        location.pathname === `/clubs/${club._id}`
-                          ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
-                          : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                      }`}
+                      to={`/clubs/${club._id}`}
+                      state={{ clubData: club }}
+                      className={({ isActive }) =>
+                        `w-full text-left font-medium py-2 px-6 rounded-lg transition-colors duration-200 ${
+                          isActive
+                            ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
+                            : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                        }`
+                      }
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       {club.name}
-                    </button>
+                    </NavLink>
                   ))}
                 </div>
-                <Link
+
+                <NavLink
                   to="/all-events"
-                  className={`font-medium py-2 px-3 rounded-lg transition-colors duration-200 ${
-                    isActive("/all-events")
-                      ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
-                      : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                  }`}
+                  className={({ isActive }) =>
+                    `font-medium py-2 px-3 rounded-lg transition-colors duration-200 ${
+                      isActive
+                        ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
+                        : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    }`
+                  }
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Events
-                </Link>
+                </NavLink>
               </nav>
             </div>
           </div>

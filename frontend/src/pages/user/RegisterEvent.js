@@ -140,8 +140,12 @@ const RegisterEvent = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 py-20 px-4">
       <div className="max-w-4xl mx-auto" ref={sectionRef}>
         {/* Header */}
-        <div className={`text-center mb-12 transition-all duration-1000 transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-700 via-blue-600 to-purple-600 dark:from-white dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-4">
+
+        <div className={`text-center mb-12 transition-all duration-1000 transform ${
+          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        }`}>
+          <h1 className="text-4xl md:text-5xl font-bold text-green-700 mb-4">
+
             My Registered Events
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-300">

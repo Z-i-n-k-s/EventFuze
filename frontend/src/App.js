@@ -44,21 +44,23 @@ function App() {
     (path) => location.pathname.startsWith(path)
   );
 
+  // Header visibility: show on admin panel or normal pages
+  const showHeader = !isPublicRoute;
+
+  // Footer visibility: show only on normal pages for logged-in users
+  const showFooter = !isPublicRoute && !isAdminPanel && user;
+
   return (
     <Context.Provider value={{ fetchUserDetails }}>
       <ToastContainer />
-      <div className="flex">
-        {/* Main content */}
-        <div className="flex-1 flex flex-col">
-          <Header />
+      <div className="flex flex-col min-h-screen">
+        {showHeader && <Header />}
 
-          <main className="min-h-[calc(100vh-120px)]">
-            <Outlet />
-          </main>
+        <main className={`flex-1 ${showHeader ? "min-h-[calc(100vh-120px)]" : ""}`}>
+          <Outlet />
+        </main>
 
-          {/* Footer only for student/user pages and public pages */}
-          {user && !isAdminPanel && !isPublicRoute && <Footer />}
-        </div>
+        {showFooter && <Footer />}
       </div>
     </Context.Provider>
   );

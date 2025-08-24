@@ -13,7 +13,7 @@ const EventList = ({
   handleDelete,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+    <div className=" bg-gray-300 dark:bg-slate-800 rounded-xl overflow-hidden">
       <div className="p-6 border-b">
         <h2 className="text-xl font-semibold">
           All Events ({filteredEvents.length})
@@ -35,12 +35,12 @@ const EventList = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="p-6 hover:bg-gray-50 transition-colors"
+              className="p-6 dark:hover:bg-slate-900 transition-colors"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold ">
                       {event.title}
                     </h3>
                     <span
@@ -63,7 +63,7 @@ const EventList = ({
                     </span>
                   </div>
 
-                  <p className="text-gray-600 mb-4 line-clamp-2">
+                  <p className=" mb-4 line-clamp-2">
                     {event.description}
                   </p>
 
