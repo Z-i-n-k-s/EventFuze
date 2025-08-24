@@ -159,11 +159,6 @@ const clubsData = [
   },
 ];
 
-// 
-
-
-// clubsData same as before...
-
 const ClubDetails = () => {
   const { clubId } = useParams();
   const navigate = useNavigate();
@@ -173,22 +168,10 @@ const ClubDetails = () => {
   const club = clubsData.find((c) => c.id === clubId);
 
   const handleJoin = (clubId) => {
-    navigate(`/join-club/${clubId}`); // ✅ navigate to JoinForm
+    navigate(`/join-club/${clubId}`);
   };
 
   if (!club) return <p className="text-center text-xl p-8">Club not found!</p>;
-
-  const themeClasses = {
-    background: isDarkMode ? "bg-slate-900" : "bg-gradient-to-br from-green-50 to-emerald-100",
-    cardBg: isDarkMode ? "bg-slate-800" : "bg-white",
-    text: isDarkMode ? "text-white" : "text-slate-800",
-    textSecondary: isDarkMode ? "text-slate-300" : "text-slate-600",
-    accent: isDarkMode ? "bg-emerald-700" : "bg-gradient-to-r from-emerald-500 to-green-600",
-    border: isDarkMode ? "border-slate-700" : "border-emerald-200",
-    button: isDarkMode
-      ? "bg-emerald-600 hover:bg-emerald-700"
-      : "bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700",
-  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -201,7 +184,7 @@ const ClubDetails = () => {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${themeClasses.background}`}>
+    <div className="min-h-screen bg-green-100 dark:bg-slate-800">
       <div className="container mx-auto px-4 py-12">
         {/* Header Section */}
         <motion.div
@@ -210,11 +193,11 @@ const ClubDetails = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${themeClasses.text}`}>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-black dark:text-white">
             {club.name}
           </h1>
           <motion.p
-            className={`text-xl max-w-4xl mx-auto leading-relaxed ${themeClasses.textSecondary}`}
+            className="text-xl max-w-4xl mx-auto leading-relaxed text-black dark:text-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -225,39 +208,39 @@ const ClubDetails = () => {
 
         {/* About Club */}
         <motion.div
-          className={`rounded-2xl p-8 mb-16 shadow-lg ${themeClasses.cardBg}`}
+          className="rounded-2xl p-8 mb-16 shadow-lg bg-white dark:bg-slate-800"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
         >
-          <h2 className={`text-3xl font-bold mb-6 ${themeClasses.text}`}>About Our Club</h2>
-          <p className={`text-lg leading-relaxed ${themeClasses.textSecondary}`}>
+          <h2 className="text-3xl font-bold mb-6 text-black dark:text-white">About Our Club</h2>
+          <p className="text-lg leading-relaxed text-black dark:text-white">
             {club.detailedDescription}
           </p>
         </motion.div>
 
-        {/* ✅ Meet Our Team (moved to separate component) */}
+        {/* ✅ Meet Our Team */}
         <MeetTeam team={club.team} isDarkMode={isDarkMode} />
 
         {/* ✅ Join Our Team Button */}
         <JoinClub/>
 
-        {/* Club Events Section (same as before) */}
+        {/* Club Events Section */}
         {club.events.length > 0 && (
           <motion.div
-            className={`rounded-2xl p-8 mb-16 shadow-lg ${themeClasses.cardBg}`}
+            className="rounded-2xl p-8 mb-16 shadow-lg bg-white dark:bg-slate-800"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
             viewport={{ once: true }}
           >
-            <h2 className={`text-3xl font-bold mb-8 ${themeClasses.text}`}>Club Events</h2>
+            <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Club Events</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {club.events.map((event, idx) => (
                 <motion.div
                   key={event.id}
-                  className={`rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 ${themeClasses.cardBg}`}
+                  className="rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 bg-white dark:bg-slate-800"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
@@ -267,23 +250,23 @@ const ClubDetails = () => {
                     <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
                   </div>
                   <div className="p-6">
-                    <h4 className={`font-bold text-xl mb-3 ${themeClasses.text}`}>{event.title}</h4>
-                    <p className={`mb-4 ${themeClasses.textSecondary}`}>{event.description}</p>
+                    <h4 className="font-bold text-xl mb-3 text-black dark:text-white">{event.title}</h4>
+                    <p className="mb-4 text-black dark:text-white">{event.description}</p>
                     <div className="space-y-2 mb-4">
-                      <div className={`flex items-center ${themeClasses.textSecondary}`}>
+                      <div className="flex items-center text-black dark:text-white">
                         <Calendar className="mr-2 h-4 w-4" />
                         {formatDate(event.date)}
                       </div>
-                      <div className={`flex items-center ${themeClasses.textSecondary}`}>
+                      <div className="flex items-center text-black dark:text-white">
                         <Clock className="mr-2 h-4 w-4" />
                         {event.time}
                       </div>
-                      <div className={`flex items-center ${themeClasses.textSecondary}`}>
+                      <div className="flex items-center text-black dark:text-white">
                         <MapPin className="mr-2 h-4 w-4" />
                         {event.location}
                       </div>
                     </div>
-                    <button className={`w-full py-2 px-4 rounded-lg text-white font-medium ${themeClasses.button}`}>
+                    <button className="w-full py-2 px-4 rounded-lg text-white font-medium bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 dark:bg-emerald-600 dark:hover:bg-emerald-700">
                       Register Now
                     </button>
                   </div>
@@ -293,21 +276,21 @@ const ClubDetails = () => {
           </motion.div>
         )}
 
-        {/* Achievements Section (same as before) */}
+        {/* Achievements Section */}
         {club.achievements.length > 0 && (
           <motion.div
-            className={`rounded-2xl p-8 mb-16 shadow-lg ${themeClasses.cardBg}`}
+            className="rounded-2xl p-8 mb-16 shadow-lg bg-white dark:bg-slate-800"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
             viewport={{ once: true }}
           >
-            <h2 className={`text-3xl font-bold mb-6 ${themeClasses.text}`}>Our Achievements</h2>
+            <h2 className="text-3xl font-bold mb-6 text-black dark:text-white">Our Achievements</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {club.achievements.map((achievement, idx) => (
                 <motion.div
                   key={idx}
-                  className={`p-4 rounded-lg ${themeClasses.accent} text-white`}
+                  className="p-4 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 dark:bg-emerald-700 text-white"
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}

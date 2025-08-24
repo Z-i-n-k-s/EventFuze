@@ -153,21 +153,26 @@ const EditDetails = ({ event, onClose, onSave }) => {
               />
             </div>
 
-            {/* Attendees */}
+            {/* Attendees - Read-only field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Users className="inline h-4 w-4 mr-1" />
-                Attendees
+                Registered Attendees
               </label>
-              <input
-                type="number"
-                name="attendees"
-                value={editedEvent.attendees}
-                onChange={handleInputChange}
-                min="0"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
-                required
-              />
+              <div className="relative">
+                <input
+                  type="number"
+                  value={editedEvent.attendees}
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-gray-100 dark:bg-slate-700 dark:text-white cursor-not-allowed"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">people</span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                This value updates automatically as people register
+              </p>
             </div>
 
             {/* Image Upload */}

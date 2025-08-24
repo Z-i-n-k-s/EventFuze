@@ -9,8 +9,9 @@ import {
   FaEye,
   FaEdit
 } from 'react-icons/fa';
-import ViewDetails from '../../components/user/ViewDetails';
+
 import EditDetails from '../../components/subAdmin/EditDetails';
+import ViewEventDet from '../../components/subAdmin/ViewEventDet';
 
 
 const ClubDashboard = () => {
@@ -237,7 +238,7 @@ const ClubDashboard = () => {
 
       {/* View Details Modal */}
       {selectedEvent && (
-        <ViewDetails 
+        <ViewEventDet
           event={selectedEvent} 
           onClose={() => setSelectedEvent(null)} 
         />

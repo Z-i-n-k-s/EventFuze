@@ -17,7 +17,7 @@ const MeetTeam = ({ team = [], isDarkMode = false }) => {
       transition={{ duration: 0.7 }}
       viewport={{ once: true }}
     >
-      <h2 className={`text-3xl font-bold mb-8 text-center ${themeClasses.text}`}>
+      <h2 className={`text-3xl font-bold mb-8 text-center text-green-800 dark:text-white`}>
         Meet Our Team
       </h2>
 
