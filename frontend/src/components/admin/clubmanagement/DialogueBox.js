@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Building2, Plus, Trash2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import SummaryApi from "../../../common";
 
 const DialogueBox = ({ 
   showCreateForm, 
@@ -16,7 +17,7 @@ const DialogueBox = ({
     description: "",
     images: [],
     milestones: [],
-    adminId: "",
+    adminName: "",
     members: []
   });
 
@@ -28,6 +29,39 @@ const DialogueBox = ({
     date: "",
     image: ""
   });
+  const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+
+  // Fetch students for admin dropdown
+  const fetchStudents = async () => {
+    setLoadingStudents(true);
+    try {
+      const response = await fetch(SummaryApi.allUser.url, {
+        method: SummaryApi.allUser.method,
+        credentials: 'include',
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Filter only students
+        const studentUsers = data.data.filter(user => user.role === "STUDENT");
+        setStudents(studentUsers);
+      } else {
+        console.error("Failed to fetch students:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showCreateForm) {
+      fetchStudents();
+    }
+  }, [showCreateForm]);
 
   useEffect(() => {
     if (editingClub) {
@@ -36,7 +70,7 @@ const DialogueBox = ({
         description: editingClub.description || "",
         images: editingClub.images || [],
         milestones: editingClub.milestones || [],
-        adminId: editingClub.adminId || "",
+        adminName: editingClub.adminName || "",
         members: editingClub.members || []
       });
     } else {
@@ -45,7 +79,7 @@ const DialogueBox = ({
         description: "",
         images: [],
         milestones: [],
-        adminId: "",
+        adminName: "",
         members: []
       });
     }
@@ -63,8 +97,8 @@ const DialogueBox = ({
       newErrors.description = "Description is required";
     }
     
-    if (!formData.adminId.trim()) {
-      newErrors.adminId = "Admin ID is required";
+    if (!formData.adminName.trim()) {
+      newErrors.adminName = "Admin is required";
     }
 
     setErrors(newErrors);
@@ -82,6 +116,8 @@ const DialogueBox = ({
       };
 
       if (editingClub) {
+        // Include clubId for updates
+        submitData.clubId = editingClub._id || editingClub.id;
         updateClub(submitData);
       } else {
         addClub(submitData);
@@ -218,20 +254,31 @@ const DialogueBox = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Admin ID *
+                    Admin *
                   </label>
-                  <input
-                    type="text"
-                    name="adminId"
-                    value={formData.adminId}
+                  <select
+                    name="adminName"
+                    value={formData.adminName}
                     onChange={handleInputChange}
                     className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                      errors.adminId ? 'border-red-300' : 'border-gray-200'
+                      errors.adminName ? 'border-red-300' : 'border-gray-200'
                     }`}
-                    placeholder="Enter admin user ID"
-                  />
-                  {errors.adminId && (
-                    <p className="text-red-500 text-sm mt-1">{errors.adminId}</p>
+                  >
+                    <option value="">Select an admin</option>
+                    {loadingStudents ? (
+                      <option value="">Loading students...</option>
+                    ) : students.length === 0 ? (
+                      <option value="">No students found</option>
+                    ) : (
+                      students.map(student => (
+                        <option key={student._id} value={student.name}>
+                          {student.name}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                  {errors.adminName && (
+                    <p className="text-red-500 text-sm mt-1">{errors.adminName}</p>
                   )}
                 </div>
               </div>

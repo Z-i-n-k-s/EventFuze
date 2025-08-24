@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const clubModel = require("../../models/clubModel");
 const userModel = require("../../models/userModel");
 
@@ -6,7 +7,20 @@ async function createClub(req, res) {
     const { name, description, images, milestones, adminId, adminName } = req.body;
 
     if (!name) {
-      return res.status(400).json({ message: "Club name is required", success: false, error: true });
+      return res.status(400).json({
+        message: "Club name is required",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Validate adminId format if provided
+    if (adminId && !mongoose.Types.ObjectId.isValid(adminId)) {
+      return res.status(400).json({
+        message: "Invalid adminId",
+        success: false,
+        error: true,
+      });
     }
 
     // Check if this admin is already managing another club
@@ -21,27 +35,17 @@ async function createClub(req, res) {
       }
     }
 
+    // Prepare members array with admin as President
     const members = [];
-
     if (adminId && adminName) {
-      // Add the admin as the President automatically
       members.push({
         userId: adminId,
         role: "President",
         joinedAt: new Date(),
       });
-
-      // Update the user's clubs array and role to CLUB_ADMIN
-      await userModel.findByIdAndUpdate(
-        adminId,
-        {
-          $addToSet: { clubs: name }, // Add club to user's clubs array
-          $set: { role: "CLUB_ADMIN" } // Update role to CLUB_ADMIN
-        },
-        { new: true }
-      );
     }
 
+    // Create new club
     const club = new clubModel({
       name,
       description,
@@ -54,6 +58,26 @@ async function createClub(req, res) {
 
     const savedClub = await club.save();
 
+    // Update user's clubs array after saving club
+    if (adminId && adminName) {
+      await userModel.findByIdAndUpdate(
+        adminId,
+        {
+          $addToSet: {
+            clubs: {
+              clubId: savedClub._id.toString(),
+              clubName: savedClub.name,
+              role: "President",        // Set correct club role
+              joinedAt: new Date(),     // Add joined date
+            },
+          },
+          $set: { role: "CLUB_ADMIN" }, // Set global user role
+        },
+        { new: true }
+      );
+    }
+
+    // Return success response
     res.json({
       data: savedClub,
       message: "Club created successfully",
@@ -61,7 +85,11 @@ async function createClub(req, res) {
       error: false,
     });
   } catch (err) {
-    res.status(400).json({ message: err.message || err, success: false, error: true });
+    res.status(500).json({
+      message: err.message || err,
+      success: false,
+      error: true,
+    });
   }
 }
 
