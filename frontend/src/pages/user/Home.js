@@ -108,6 +108,14 @@ const Home = () => {
             connections.
           </motion.p>
 
+
+
+
+
+
+
+          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
