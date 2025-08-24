@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   FaCog,
   FaSignOutAlt,
@@ -10,25 +10,48 @@ import {
 } from "react-icons/fa";
 import { FaUserLarge } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import SummaryApi from "../../common";
 import { toast } from "react-toastify";
 import { setUserDetails } from "../../store/userSlice";
-import { ROLE } from "../../common/role";
-import ProfileDisplay from "./ProfileDisplay";
 import { ThemeContext } from "../../context/ThemeContext";
+import ProfileDisplay from "./ProfileDisplay";
+import { ROLE } from "../../common/role";
 
 const Header = () => {
   const user = useSelector((state) => state?.user?.user);
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
   const [menuDisplay, setMenuDisplay] = useState(false);
   const [profileDisplay, setProfileDisplay] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [clubsDropdown, setClubsDropdown] = useState(false);
+  const [clubs, setClubs] = useState([]);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
+
+  useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        const response = await fetch(SummaryApi.getAllClubs.url, {
+          method: SummaryApi.getAllClubs.method,
+          credentials: "include",
+        });
+        const data = await response.json();
+        if (data.success) {
+          setClubs(data.data || []); // Updated to use data.data based on your API response
+        } else {
+          toast.error(data.message || "Failed to fetch clubs");
+        }
+      } catch (err) {
+        toast.error("Error fetching clubs");
+      }
+    };
+
+    fetchClubs();
+  }, []);
 
   const handelLogout = async () => {
     try {
@@ -41,12 +64,23 @@ const Header = () => {
       if (data.success) {
         toast.success(data.message || "Logged out successfully");
         dispatch(setUserDetails(null));
-      } else if (data.error) {
+      } else {
         toast.error(data.message || "Something went wrong");
       }
     } catch (err) {
       toast.error("Logout failed. Try again!");
     }
+  };
+
+  // Function to handle club navigation with data
+  const handleClubNavigation = (club) => {
+    navigate(`/clubs/${club._id}`, { 
+      state: { 
+        clubData: club 
+      } 
+    });
+    setClubsDropdown(false);
+    setMobileMenuOpen(false);
   };
 
   const isActive = (path) => location.pathname === path;
@@ -55,16 +89,6 @@ const Header = () => {
     { path: "/", label: "Home" },
     { path: "/events", label: "Events" },
   ];
-
-const clubsLinks = [
-  { id: "debating", label: "Debating Club" },
-  { id: "cultural", label: "Cultural Club" },
-  { id: "robotics", label: "Robotics Club" },
-  { id: "islamic", label: "Islamic Club" },
-  { id: "innovation", label: "Innovation & Design Club" },
-  { id: "photography", label: "Photography Club" },
-];
-
 
   return (
     <>
@@ -95,7 +119,7 @@ const clubsLinks = [
                 </Link>
               ))}
 
-              {/* Clubs Dropdown (fixed) */}
+              {/* Clubs Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setClubsDropdown((prev) => !prev)}
@@ -116,23 +140,22 @@ const clubsLinks = [
                       onClick={() => setClubsDropdown(false)}
                     ></div>
 
-                 {/* Desktop Clubs Dropdown */}
-<div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden z-40">
-  {clubsLinks.map((club) => (
-    <Link
-      key={club.id}
-      to={`/clubs/${club.id}`} // dynamic route
-      className={`block px-5 py-3 text-[15px] border-b last:border-b-0 border-slate-200 dark:border-slate-700 transition-colors duration-200 ${
-        location.pathname === `/clubs/${club.id}`
-          ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
-          : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-900/20"
-      }`}
-      onClick={() => setClubsDropdown(false)}
-    >
-      {club.label}
-    </Link>
-  ))}
-</div>
+                    {/* Desktop Clubs Dropdown */}
+                    <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden z-40">
+                      {clubs.map((club) => (
+                        <button
+                          key={club._id}
+                          onClick={() => handleClubNavigation(club)}
+                          className={`w-full text-left block px-5 py-3 text-[15px] border-b last:border-b-0 border-slate-200 dark:border-slate-700 transition-colors duration-200 ${
+                            location.pathname === `/clubs/${club._id}`
+                              ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                              : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-900/20"
+                          }`}
+                        >
+                          {club.name}
+                        </button>
+                      ))}
+                    </div>
                   </>
                 )}
               </div>
@@ -150,7 +173,7 @@ const clubsLinks = [
               )}
             </button>
 
-            {/* User Section (unchanged) */}
+            {/* User Section */}
             {user?._id ? (
               <div className="relative">
                 <button
@@ -294,7 +317,7 @@ const clubsLinks = [
           </div>
         </div>
 
-        {/* Mobile Menu (unchanged) */}
+        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg z-30 font-inter text-[15px]">
             <div className="container mx-auto px-4 py-4">
@@ -311,25 +334,24 @@ const clubsLinks = [
                   Home
                 </Link>
                 {/* Mobile Clubs Menu */}
-<div className="flex flex-col gap-1">
-  <span className="font-medium px-3 py-2 text-slate-700 dark:text-slate-200">
-    Clubs
-  </span>
-  {clubsLinks.map((club) => (
-    <Link
-      key={club.id}
-      to={`/clubs/${club.id}`} // dynamic route
-      className={`font-medium py-2 px-6 rounded-lg transition-colors duration-200 ${
-        location.pathname === `/clubs/${club.id}`
-          ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
-          : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-      }`}
-      onClick={() => setMobileMenuOpen(false)}
-    >
-      {club.label}
-    </Link>
-  ))}
-</div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-medium px-3 py-2 text-slate-700 dark:text-slate-200">
+                    Clubs
+                  </span>
+                  {clubs.map((club) => (
+                    <button
+                      key={club._id}
+                      onClick={() => handleClubNavigation(club)}
+                      className={`w-full text-left font-medium py-2 px-6 rounded-lg transition-colors duration-200 ${
+                        location.pathname === `/clubs/${club._id}`
+                          ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
+                          : "text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      {club.name}
+                    </button>
+                  ))}
+                </div>
                 <Link
                   to="/all-events"
                   className={`font-medium py-2 px-3 rounded-lg transition-colors duration-200 ${
