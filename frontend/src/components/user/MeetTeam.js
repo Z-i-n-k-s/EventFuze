@@ -26,7 +26,7 @@ const MeetTeam = ({ team = [], isDarkMode = false }) => {
           {team.map((member, idx) => (
             <motion.div
               key={idx}
-              className={`rounded-2xl overflow-hidden shadow-lg transform transition-all duration-500 hover:scale-105 ${themeClasses.cardBg}`}
+              className={`rounded-2xl overflow-hidden shadow-lg transform transition-all duration-500 hover:scale-105 bg-gray-200 dark:bg-slate-500`}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
@@ -43,7 +43,7 @@ const MeetTeam = ({ team = [], isDarkMode = false }) => {
                 <h3 className={`text-xl font-bold mb-1 ${themeClasses.text}`}>
                   {member.name}
                 </h3>
-                <p className="text-emerald-500 font-medium mb-4">{member.role}</p>
+                <p className="text-black font-medium mb-4">{member.role}</p>
               </div>
             </motion.div>
           ))}
