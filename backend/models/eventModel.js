@@ -26,7 +26,10 @@ const eventSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Registration fee cannot be negative"],
     },
+
     currency: { type: String, default: "BDT" },
+
+
     // Registration period
     registrationStart: { type: Date, required: true },
     registrationDeadline: { type: Date, required: true },
@@ -40,11 +43,9 @@ eventSchema.pre("save", function (next) {
 
   // Optional: ensure registration deadline is after start
   if (this.registrationDeadline < this.registrationStart) {
-    return next(
-      new Error(
-        "Registration deadline cannot be before registration start date"
-      )
-    );
+
+    return next(new Error("Registration deadline cannot be before registration start date"));
+
   }
 
   next();
