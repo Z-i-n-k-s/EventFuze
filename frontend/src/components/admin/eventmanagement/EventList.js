@@ -112,27 +112,7 @@ const EventList = ({
                    )}
                 </div>
 
-                <div className="flex items-center gap-2 ml-4">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleEdit(event)}
-                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    title="Edit Event"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </motion.button>
-
-                                     <motion.button
-                     whileHover={{ scale: 1.05 }}
-                     whileTap={{ scale: 0.95 }}
-                     onClick={() => handleDelete(event._id)}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Delete Event"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </motion.button>
-                </div>
+                
               </div>
             </motion.div>
           ))}

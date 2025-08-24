@@ -1,62 +1,70 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, CheckCircle, XCircle, Download, MapPin } from 'lucide-react';
-
+import { useSelector } from 'react-redux';
+import SummaryApi from '../../common';
+import CertificateDownload from '../../components/user/CirtificateDownload';
 
 const MyEvents = () => {
   const [myEvents, setMyEvents] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedEvent, setSelectedEvent] = useState(null); // For certificate popup
   const sectionRef = useRef(null);
+  const user = useSelector((state) => state?.user?.user);
 
-  // Demo data
+  // Fetch registered events
   useEffect(() => {
-    const demoEvents = [
-      {
-        id: 1,
-        title: "Photography Workshop",
-        date: "2024-12-15",
-        location: "Creative Studio, Building A",
-        club: "Photography Club",
-        attended: true,
-        certificateDownloaded: false
-      },
-      {
-        id: 2,
-        title: "Cultural Festival",
-        date: "2024-12-05",
-        location: "Main Auditorium",
-        club: "Cultural Club",
-        attended: false,
-        certificateDownloaded: false
-      },
-      {
-        id: 3,
-        title: "Robotics Championship",
-        date: "2024-12-25",
-        location: "Engineering Building",
-        club: "Robotics Club",
-        attended: true,
-        certificateDownloaded: true
-      }
-    ];
-    setMyEvents(demoEvents);
-  }, []);
+    const fetchRegisteredEvents = async () => {
+      if (!user?._id) return;
+      try {
+        const res = await fetch(SummaryApi.getRegistrationsByStudent.url, {
+          method: SummaryApi.getRegistrationsByStudent.method,
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ studentId: user._id }),
+        });
 
+        const result = await res.json();
+        if (!res.ok || !result.success) throw new Error(result.message || "Failed to get registered events");
+
+        const events = result.data
+          .map((registration) => ({
+            id: registration.event._id,
+            title: registration.event.title,
+            eventStatus: registration.event.status,
+            attended: registration.attended,
+            date: registration.event.date,
+            location: registration.event.location,
+            club: registration.event.club,
+            certificateDownloaded: false,
+          }))
+          .filter(event => event.eventStatus === "completed");
+
+        setMyEvents(events);
+      } catch (error) {
+        console.error("Error fetching registered events:", error);
+        alert("Failed to get registered events.");
+      }
+    };
+
+    fetchRegisteredEvents();
+  }, [user]);
+
+  // Intersection observer for animation
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setIsVisible(true); },
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
       { threshold: 0.1 }
     );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => { if (sectionRef.current) observer.unobserve(sectionRef.current); };
-  }, []);
 
-  const handleDownload = (id) => {
-    setMyEvents(prev => prev.map(event => {
-      if (event.id === id) return { ...event, certificateDownloaded: true };
-      return event;
-    }));
-  };
+    if (sectionRef.current) observer.observe(sectionRef.current);
+
+    return () => {
+      if (sectionRef.current) observer.unobserve(sectionRef.current);
+    };
+  }, []);
 
   const filteredEvents = myEvents.filter(event =>
     event.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -98,13 +106,16 @@ const MyEvents = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
                     <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">{event.title}</h3>
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${event.attended ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'} w-fit`}>
-                      {event.attended ? <CheckCircle className="w-3 h-3"/> : <XCircle className="w-3 h-3"/>} {event.attended ? 'Attended' : 'Missed'}
+                      {event.attended ? <CheckCircle className="w-3 h-3"/> : <XCircle className="w-3 h-3"/>} 
+                      {event.attended ? 'Attended' : 'Missed'}
                     </span>
                   </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-600 dark:text-slate-300">
                     <div className="flex items-center gap-2"><Calendar className="w-4 h-4"/> {new Date(event.date).toLocaleDateString()}</div>
                     <div className="flex items-center gap-2"><MapPin className="w-4 h-4"/> {event.location}</div>
                   </div>
+
                   <div className="mt-2 text-sm">
                     <span className="text-green-600 dark:text-green-400 font-medium">{event.club}</span>
                   </div>
@@ -119,14 +130,16 @@ const MyEvents = () => {
                       </div>
                     ) : (
                       <button
-                        onClick={() => handleDownload(event.id)}
+                        onClick={() => setSelectedEvent({ userName: user.name, eventTitle: event.title })}
                         className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:shadow-lg flex items-center gap-2"
                       >
                         <Download className="w-4 h-4"/> Download Certificate
                       </button>
                     )
                   ) : (
-                    <div className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-4 py-2 rounded-xl font-medium cursor-not-allowed">No Certificate</div>
+                    <div className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-4 py-2 rounded-xl font-medium cursor-not-allowed">
+                      No Certificate
+                    </div>
                   )}
                 </div>
               </div>
@@ -135,11 +148,24 @@ const MyEvents = () => {
             <div className="text-center py-20">
               <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4"/>
               <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">No Completed Events</h3>
-              <p className="text-slate-600 dark:text-slate-400">You have not attended any events yet.</p>
+              <p className="text-slate-600 dark:text-slate-400">You have not attended any completed events yet.</p>
             </div>
           )}
         </div>
       </div>
+
+      {/* Certificate Preview Popup */}
+      {selectedEvent && (
+        <CertificateDownload
+          userName={selectedEvent.userName}
+          eventTitle={selectedEvent.eventTitle}
+          onClose={() => {
+            setSelectedEvent(null);
+            // Mark as downloaded if you want
+            setMyEvents(prev => prev.map(e => e.title === selectedEvent.eventTitle ? { ...e, certificateDownloaded: true } : e));
+          }}
+        />
+      )}
     </div>
   );
 };
