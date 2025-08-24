@@ -14,6 +14,7 @@ const ClubMembers = () => {
   const [showAddMember, setShowAddMember] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
 
+  // Fetch all members
   const fetchAllClubMembers = async () => {
     if (!presidentClubId) return;
     setShowLoader(true);
@@ -25,11 +26,11 @@ const ClubMembers = () => {
         body: JSON.stringify({ clubId: presidentClubId }),
       });
       const data = await res.json();
-      if (data.success)
+      if (data.success) {
         setMembers((data.data || []).map((m) => ({ ...m, status: m.status || "Joined" })));
-      else console.error(data.message);
+      } else console.error(data.message);
     } catch (err) {
-      console.error("Failed to fetch users.", err);
+      console.error("Failed to fetch members.", err);
     } finally {
       setShowLoader(false);
     }
@@ -48,9 +49,27 @@ const ClubMembers = () => {
         member.userId?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
-  const handleRemoveMember = (id) => {
-    setMembers(members.map((member) => (member._id === id ? { ...member, status: "Removed" } : member)));
-    setRemoveConfirm(null);
+  // Remove member API call
+  const handleRemoveMember = async (id) => {
+    if (!presidentClubId) return;
+    setShowLoader(true);
+    try {
+      const res = await fetch(SummaryApi.removeMember.url, {
+        method: SummaryApi.removeMember.method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clubId: presidentClubId, userId: id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMembers(members.map((member) => (member._id === id ? { ...member, status: "Removed" } : member)));
+        setRemoveConfirm(null);
+      } else console.error(data.message);
+    } catch (err) {
+      console.error("Failed to remove member.", err);
+    } finally {
+      setShowLoader(false);
+    }
   };
 
   const handleAddMember = (newMember) => {
@@ -64,7 +83,13 @@ const ClubMembers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-slate-900 p-6">
+    <div className="min-h-screen bg-gray-100 dark:bg-slate-900 p-6 relative">
+      {showLoader && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+          <div className="loader">Loading...</div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 md:mb-0">
@@ -160,6 +185,7 @@ const ClubMembers = () => {
       {/* Modals */}
       <RemoveMemberModal
         member={removeConfirm}
+        clubId={presidentClubId}
         onClose={() => setRemoveConfirm(null)}
         onConfirm={handleRemoveMember}
       />

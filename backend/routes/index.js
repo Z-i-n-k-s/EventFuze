@@ -67,7 +67,7 @@ router.post("/delete-user",authToken,userDeleteController)
 // Club routes
 router.get("/all-club",  getClubs);                        // fetch all clubs
 router.post("/club-details", authToken, getClubById);     // get single club by clubId in body
-router.post("/create-club", createClub);       // create new club
+router.post("/create-club", authToken, createClub);       // create new club
 router.post("/update-club", authToken, updateClub);       // update club by clubId in body
 router.post("/delete-club", authToken, deleteClub);       // delete club by clubId in body
 
@@ -84,7 +84,7 @@ router.post("/join-club", authToken, joinClub);
 router.post("/leave-club", authToken, leaveClub);
 
 //Events
-router.post("/create-event",authToken,  createEvent);
+router.post("/create-event",authToken,   createEvent);
 router.get("/all-events", getAllEvents);
 router.put("/update-event",authToken,  updateEvent);
 router.delete("/delete-event", authToken, deleteEvent);
