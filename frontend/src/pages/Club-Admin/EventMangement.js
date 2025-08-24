@@ -1,86 +1,44 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import EditDetails from "../../components/subAdmin/EditDetails";
+import { getEventStatus, getStatusBadgeConfig } from "../../helpers/eventStatusHelper";
+import { eventService } from "../../services/eventService";
 
 const EventManagement = () => {
-  // Sample data based on your schema
-  const [events, setEvents] = useState([
-    {
-      _id: "1",
-      title: "Annual Tech Conference",
-      description:
-        "A gathering of tech enthusiasts to discuss the latest trends in technology.",
-      category: "Technology",
-      date: "2023-11-15",
-      startTime: "09:00",
-      endTime: "17:00",
-      location: "University Auditorium",
-      maxParticipants: 200,
-      registeredStudents: ["std101", "std102", "std103", "std104"],
-      clubsId: ["club1", "club2"],
-      images: ["image1.jpg", "image2.jpg"],
-      createdBy: "admin1",
-      status: "upcoming",
-      isFree: true,
-      registrationFee: 0,
-      currency: "USD",
-      createdAt: "2023-10-01T10:00:00Z",
-      updatedAt: "2023-10-05T14:30:00Z",
-      provideCertificate: true,
-    },
-    {
-      _id: "2",
-      title: "Music Festival",
-      description: "Annual music festival featuring local bands and artists.",
-      category: "Music",
-      date: "2023-12-05",
-      startTime: "14:00",
-      endTime: "22:00",
-      location: "Campus Grounds",
-      maxParticipants: 500,
-      registeredStudents: ["std101", "std105", "std106", "std107", "std108"],
-      clubsId: ["club3"],
-      images: ["music1.jpg"],
-      createdBy: "admin2",
-      status: "upcoming",
-      isFree: false,
-      registrationFee: 15,
-      currency: "USD",
-      createdAt: "2023-09-20T08:45:00Z",
-      updatedAt: "2023-10-10T11:20:00Z",
-      provideCertificate: false,
-    },
-    {
-      _id: "3",
-      title: "Charity Run",
-      description: "5K run to raise funds for local community projects.",
-      category: "Sports",
-      date: "2023-10-10",
-      startTime: "08:00",
-      endTime: "12:00",
-      location: "City Park",
-      maxParticipants: 300,
-      registeredStudents: ["std109", "std110", "std111"],
-      clubsId: ["club4", "club5"],
-      images: ["run1.jpg", "run2.jpg"],
-      createdBy: "admin1",
-      status: "completed",
-      isFree: false,
-      registrationFee: 10,
-      currency: "USD",
-      createdAt: "2023-08-15T09:30:00Z",
-      updatedAt: "2023-10-11T13:45:00Z",
-      provideCertificate: true,
-    },
-  ]);
+  const [events, setEvents] = useState([]);
+
+  // Fetch events from backend
+  const fetchEvents = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await eventService.getAllEvents();
+      if (response.success) {
+        setEvents(response.data);
+      } else {
+        toast.error(response.message || 'Failed to fetch events');
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      toast.error('Failed to fetch events from server');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Filter events based on status and search term
   const filteredEvents = events.filter((event) => {
-    const matchesFilter = filter === "all" || event.status === filter;
+    const autoStatus = getEventStatus(event);
+    const matchesFilter = filter === "all" || autoStatus === filter;
     const matchesSearch =
       event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -89,9 +47,20 @@ const EventManagement = () => {
   });
 
   // Function to handle event deletion
-  const handleDeleteEvent = (id) => {
-    setEvents(events.filter((event) => event._id !== id));
-    setDeleteConfirm(null);
+  const handleDeleteEvent = async (id) => {
+    try {
+      const response = await eventService.deleteEvent(id);
+      if (response.success) {
+        setEvents(events.filter((event) => event._id !== id));
+        setDeleteConfirm(null);
+        toast.success("Event deleted successfully!");
+      } else {
+        toast.error(response.message || 'Failed to delete event');
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast.error('Failed to delete event');
+    }
   };
 
   // Function to toggle certificate provision
@@ -106,27 +75,31 @@ const EventManagement = () => {
   };
 
   // Function to get status badge color
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "upcoming":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-      case "ongoing":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      case "completed":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-      default:
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-    }
+  const getStatusColor = (event) => {
+    const status = getEventStatus(event);
+    const config = getStatusBadgeConfig(status);
+    return config.color;
   };
 
   // Function to handle event update after editing
-  const handleEventUpdate = (updatedEvent) => {
-    setEvents(
-      events.map((event) =>
-        event._id === updatedEvent._id ? updatedEvent : event
-      )
-    );
-    setEditingEvent(null);
+  const handleEventUpdate = async (updatedEvent) => {
+    try {
+      const response = await eventService.updateEvent(updatedEvent);
+      if (response.success) {
+        setEvents(
+          events.map((event) =>
+            event._id === updatedEvent._id ? response.data : event
+          )
+        );
+        setEditingEvent(null);
+        toast.success("Event updated successfully!");
+      } else {
+        toast.error(response.message || 'Failed to update event');
+      }
+    } catch (error) {
+      console.error('Error updating event:', error);
+      toast.error('Failed to update event');
+    }
   };
 
   return (
@@ -173,8 +146,14 @@ const EventManagement = () => {
       </div>
 
       {/* Events Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredEvents.length > 0 ? (
+      {loading ? (
+        <div className="col-span-full text-center py-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">Loading events...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredEvents.length > 0 ? (
           filteredEvents.map((event) => (
             <div
               key={event._id}
@@ -186,10 +165,10 @@ const EventManagement = () => {
                 </h3>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                    event.status
+                    event
                   )}`}
                 >
-                  {event.status}
+                  {getEventStatus(event)}
                 </span>
               </div>
 
@@ -311,14 +290,15 @@ const EventManagement = () => {
               </div>
             </div>
           ))
-        ) : (
-          <div className="col-span-full text-center py-10">
-            <p className="text-gray-500 dark:text-gray-400">
-              No events found matching your criteria.
-            </p>
-          </div>
-        )}
-      </div>
+                  ) : (
+            <div className="col-span-full text-center py-10">
+              <p className="text-gray-500 dark:text-gray-400">
+                No events found matching your criteria.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (

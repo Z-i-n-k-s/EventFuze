@@ -1,7 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Building2, Plus, Trash2, X } from 'lucide-react';
+import { Building2, Plus, Trash2, Upload, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { toast } from "react-toastify";
 import SummaryApi from "../../../common";
+import uploadImage from "../../../helpers/uploadImage";
 
 const DialogueBox = ({ 
   showCreateForm, 
@@ -18,11 +20,11 @@ const DialogueBox = ({
     images: [],
     milestones: [],
     adminName: "",
+    adminId: "",
     members: []
   });
 
   const [errors, setErrors] = useState({});
-  const [newImage, setNewImage] = useState("");
   const [newMilestone, setNewMilestone] = useState({
     title: "",
     description: "",
@@ -31,6 +33,9 @@ const DialogueBox = ({
   });
   const [students, setStudents] = useState([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadingMilestoneImage, setUploadingMilestoneImage] = useState(false);
+  const [addingMilestone, setAddingMilestone] = useState(false);
 
   // Fetch students for admin dropdown
   const fetchStudents = async () => {
@@ -43,11 +48,13 @@ const DialogueBox = ({
       
       const data = await response.json();
       
-      if (data.success) {
-        // Filter only students
-        const studentUsers = data.data.filter(user => user.role === "STUDENT");
-        setStudents(studentUsers);
-      } else {
+             if (data.success) {
+         // Filter only students
+         const studentUsers = data.data.filter(user => user.role === "STUDENT");
+         console.log("Fetched students:", studentUsers); // Debug log
+         console.log("First student ID:", studentUsers[0]?._id); // Debug log
+         setStudents(studentUsers);
+       } else {
         console.error("Failed to fetch students:", data.message);
       }
     } catch (error) {
@@ -71,6 +78,7 @@ const DialogueBox = ({
         images: editingClub.images || [],
         milestones: editingClub.milestones || [],
         adminName: editingClub.adminName || "",
+        adminId: editingClub.adminId || "",
         members: editingClub.members || []
       });
     } else {
@@ -80,6 +88,7 @@ const DialogueBox = ({
         images: [],
         milestones: [],
         adminName: "",
+        adminId: "",
         members: []
       });
     }
@@ -109,11 +118,24 @@ const DialogueBox = ({
     e.preventDefault();
     
     if (validateForm()) {
+      // Ensure milestones have proper date format for backend
+      const formattedMilestones = formData.milestones.map(milestone => ({
+        ...milestone,
+        date: milestone.date ? new Date(milestone.date).toISOString() : new Date().toISOString()
+      }));
+
       const submitData = {
         ...formData,
+        milestones: formattedMilestones,
         createdAt: editingClub ? editingClub.createdAt : new Date().toISOString(),
         updatedAt: editingClub ? new Date().toISOString() : null
       };
+
+       console.log("Submitting club data:", submitData); // Debug log
+       console.log("Admin ID being sent:", submitData.adminId); // Debug log
+       console.log("Admin Name being sent:", submitData.adminName); // Debug log
+       console.log("Admin ID type:", typeof submitData.adminId); // Debug log
+       console.log("Admin ID length:", submitData.adminId?.length); // Debug log
 
       if (editingClub) {
         // Include clubId for updates
@@ -143,13 +165,29 @@ const DialogueBox = ({
     }
   };
 
-  const addImage = () => {
-    if (newImage.trim()) {
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setUploadingImages(true);
+    try {
+      // Upload multiple images to Cloudinary
+      const uploadedImages = await uploadImage(files, "mern_product");
+      
+      // Extract secure_urls from the response
+      const imageUrls = uploadedImages.map(img => img.secure_url);
+      
       setFormData(prev => ({
         ...prev,
-        images: [...prev.images, newImage.trim()]
+        images: [...prev.images, ...imageUrls]
       }));
-      setNewImage("");
+      
+      toast.success(`${files.length} image(s) uploaded successfully!`);
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      toast.error("Failed to upload images. Please try again.");
+    } finally {
+      setUploadingImages(false);
     }
   };
 
@@ -160,18 +198,114 @@ const DialogueBox = ({
     }));
   };
 
-  const addMilestone = () => {
-    if (newMilestone.title.trim() && newMilestone.description.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        milestones: [...prev.milestones, { ...newMilestone, date: newMilestone.date || new Date().toISOString() }]
-      }));
+  const addMilestone = async () => {
+    if (!newMilestone.title.trim() || !newMilestone.description.trim()) {
+      toast.error("Title and description are required for milestones");
+      return;
+    }
+
+    // If editing an existing club, use the API
+    if (editingClub?._id) {
+      setAddingMilestone(true);
+      try {
+        const milestoneData = {
+          clubId: editingClub._id,
+          title: newMilestone.title,
+          description: newMilestone.description,
+          date: newMilestone.date || new Date().toISOString(),
+          image: newMilestone.image || ""
+        };
+
+        const response = await fetch(SummaryApi.addMilestone.url, {
+          method: SummaryApi.addMilestone.method,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(milestoneData),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Update the form data with the new milestone
+          setFormData(prev => ({
+            ...prev,
+            milestones: data.data.milestones
+          }));
+          
+          // Reset the milestone form
+          setNewMilestone({
+            title: "",
+            description: "",
+            date: "",
+            image: ""
+          });
+          
+          toast.success("Milestone added successfully!");
+        } else {
+          toast.error(data.message || "Failed to add milestone");
+        }
+      } catch (error) {
+        console.error("Error adding milestone:", error);
+        toast.error("Failed to add milestone");
+      } finally {
+        setAddingMilestone(false);
+      }
+    } else {
+      // If creating a new club, add milestone locally
+      const newMilestoneData = {
+        title: newMilestone.title,
+        description: newMilestone.description,
+        date: newMilestone.date || new Date().toISOString(),
+        image: newMilestone.image || ""
+      };
+
+      console.log("Adding milestone to form:", newMilestoneData); // Debug log
+
+      setFormData(prev => {
+        const updatedMilestones = [...prev.milestones, newMilestoneData];
+        console.log("Updated milestones array:", updatedMilestones); // Debug log
+        return {
+          ...prev,
+          milestones: updatedMilestones
+        };
+      });
+      
+      // Reset the milestone form
       setNewMilestone({
         title: "",
         description: "",
         date: "",
         image: ""
       });
+      
+      toast.success("Milestone added to form! It will be saved with the club.");
+    }
+  };
+
+  const handleMilestoneImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingMilestoneImage(true);
+    try {
+      // Upload single image to Cloudinary
+      const uploadedImage = await uploadImage(file, "mern_product");
+      
+      console.log("Milestone image uploaded:", uploadedImage); // Debug log
+      
+      setNewMilestone(prev => ({
+        ...prev,
+        image: uploadedImage.secure_url
+      }));
+      
+      toast.success("Milestone image uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading milestone image:", error);
+      toast.error("Failed to upload milestone image. Please try again.");
+    } finally {
+      setUploadingMilestoneImage(false);
     }
   };
 
@@ -259,7 +393,25 @@ const DialogueBox = ({
                   <select
                     name="adminName"
                     value={formData.adminName}
-                    onChange={handleInputChange}
+                                         onChange={(e) => {
+                       const selectedStudent = students.find(student => student.name === e.target.value);
+                       console.log("Selected student:", selectedStudent); // Debug log
+                       console.log("Selected student ID:", selectedStudent?._id); // Debug log
+                       
+                       setFormData(prev => ({
+                         ...prev,
+                         adminName: e.target.value,
+                         adminId: selectedStudent ? selectedStudent._id : ""
+                       }));
+                       
+                       // Clear error when user selects
+                       if (errors.adminName) {
+                         setErrors(prev => ({
+                           ...prev,
+                           adminName: ""
+                         }));
+                       }
+                     }}
                     className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                       errors.adminName ? 'border-red-300' : 'border-gray-200'
                     }`}
@@ -309,21 +461,24 @@ const DialogueBox = ({
                 </label>
                 <div className="space-y-3">
                   <div className="flex gap-2">
-                    <input
-                      type="url"
-                      value={newImage}
-                      onChange={(e) => setNewImage(e.target.value)}
-                      placeholder="Add image URL"
-                      className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={addImage}
-                      className="px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Add
-                    </button>
+                    <label className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer hover:bg-gray-50 flex items-center justify-center gap-2">
+                      {uploadingImages ? (
+                        <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4 text-gray-500" />
+                      )}
+                      <span className="text-gray-500">
+                        {uploadingImages ? "Uploading..." : "Click to upload images"}
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={uploadingImages}
+                      />
+                    </label>
                   </div>
                   
                   {formData.images.length > 0 && (
@@ -373,30 +528,74 @@ const DialogueBox = ({
                       className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <textarea
-                      value={newMilestone.description}
-                      onChange={(e) => handleMilestoneChange('description', e.target.value)}
-                      placeholder="Milestone description"
-                      rows={2}
-                      className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    />
-                    <input
-                      type="url"
-                      value={newMilestone.image}
-                      onChange={(e) => handleMilestoneChange('image', e.target.value)}
-                      placeholder="Milestone image URL (optional)"
-                      className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    />
-                  </div>
+                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                     <textarea
+                       value={newMilestone.description}
+                       onChange={(e) => handleMilestoneChange('description', e.target.value)}
+                       placeholder="Milestone description"
+                       rows={2}
+                       className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                     />
+                     <div className="space-y-2">
+                       <label className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer hover:bg-gray-50 flex items-center justify-center gap-2">
+                         {uploadingMilestoneImage ? (
+                           <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                         ) : (
+                           <Upload className="w-4 h-4 text-gray-500" />
+                         )}
+                         <span className="text-gray-500">
+                           {uploadingMilestoneImage ? "Uploading..." : "Upload milestone image"}
+                         </span>
+                         <input
+                           type="file"
+                           accept="image/*"
+                           onChange={handleMilestoneImageUpload}
+                           className="hidden"
+                           disabled={uploadingMilestoneImage}
+                         />
+                       </label>
+                       
+                       {/* Image Preview */}
+                       {newMilestone.image && (
+                         <div className="relative group">
+                           <img
+                             src={newMilestone.image}
+                             alt="Milestone preview"
+                             className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                             onError={(e) => {
+                               e.target.src = "https://via.placeholder.com/150x100?text=Image+Error";
+                             }}
+                           />
+                           <button
+                             type="button"
+                             onClick={() => setNewMilestone(prev => ({ ...prev, image: "" }))}
+                             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                           >
+                             <Trash2 className="w-3 h-3" />
+                           </button>
+                         </div>
+                       )}
+                     </div>
+                   </div>
                   <button
                     type="button"
                     onClick={addMilestone}
-                    className="px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
+                    disabled={addingMilestone}
+                    className="px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Plus className="w-4 h-4" />
-                    Add Milestone
+                    {addingMilestone ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4" />
+                    )}
+                    {addingMilestone ? "Adding..." : "Add Milestone"}
                   </button>
+                  
+                  {!editingClub?._id && (
+                    <p className="text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
+                      💡 You can add milestones now! They will be saved with the club.
+                    </p>
+                  )}
                   
                   {formData.milestones.length > 0 && (
                     <div className="space-y-3">
@@ -416,7 +615,17 @@ const DialogueBox = ({
                           <div className="flex items-center gap-4 text-xs text-gray-500">
                             <span>{new Date(milestone.date).toLocaleDateString()}</span>
                             {milestone.image && (
-                              <span>Has image</span>
+                              <div className="flex items-center gap-2">
+                                <span>Has image</span>
+                                <img
+                                  src={milestone.image}
+                                  alt={milestone.title}
+                                  className="w-8 h-8 object-cover rounded"
+                                  onError={(e) => {
+                                    e.target.style.display = 'none';
+                                  }}
+                                />
+                              </div>
                             )}
                           </div>
                         </div>

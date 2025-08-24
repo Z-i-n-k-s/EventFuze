@@ -1,19 +1,18 @@
-import { motion } from "framer-motion";
 import {
   AlertCircle,
   CheckCircle,
   Clock,
-  Plus,
   TrendingUp,
-  XCircle,
+  XCircle
 } from "lucide-react";
 import moment from "moment";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Cards from "../../components/admin/eventmanagement/Cards";
-import DialogueBox from "../../components/admin/eventmanagement/DialogueBox";
 import EventList from "../../components/admin/eventmanagement/EventList";
 import EventSearch from "../../components/admin/eventmanagement/EventSearch";
+import { getEventStatus, getStatusBadgeConfig } from "../../helpers/eventStatusHelper";
+import { eventService } from "../../services/eventService";
 
 const EventManagement = () => {
   const [events, setEvents] = useState([]);
@@ -23,97 +22,29 @@ const EventManagement = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // Sample data for demonstration
-  useEffect(() => {
-    const sampleEvents = [
-      {
-        id: 1,
-        title: "Annual Tech Conference 2024",
-        description:
-          "Join us for the biggest tech event of the year featuring keynote speakers, workshops, and networking opportunities.",
-        date: "2024-03-15",
-        startTime: "09:00",
-        endTime: "17:00",
-        location: "Convention Center, Downtown",
-        category: "Technology Conference",
-        capacity: 500,
-        registered: 342,
-        price: 299,
-        clubId: "tech-club",
-        contactEmail: "info@techevents.com",
-        contactPhone: "+1 (555) 123-4567",
-        imageUrl:
-          "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400",
-        status: "upcoming",
-        createdAt: "2024-01-15",
-      },
-      {
-        id: 2,
-        title: "Startup Networking Mixer",
-        description:
-          "Connect with fellow entrepreneurs, investors, and industry experts in a relaxed networking environment.",
-        date: "2024-02-28",
-        startTime: "18:00",
-        endTime: "21:00",
-        location: "Innovation Hub, Tech District",
-        category: "Networking Event",
-        capacity: 100,
-        registered: 87,
-        price: 0,
-        clubId: "business-club",
-        contactEmail: "hello@startupcommunity.org",
-        contactPhone: "+1 (555) 987-6543",
-        imageUrl:
-          "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=400",
-        status: "upcoming",
-        createdAt: "2024-01-10",
-      },
-      {
-        id: 3,
-        title: "Marketing Workshop Series",
-        description:
-          "Learn the latest digital marketing strategies from industry experts. Hands-on workshops included.",
-        date: "2024-01-20",
-        startTime: "14:00",
-        endTime: "18:00",
-        location: "Business Center, Main Street",
-        category: "Marketing Workshop",
-        capacity: 50,
-        registered: 50,
-        price: 149,
-        clubId: "business-club",
-        contactEmail: "workshops@marketingpro.com",
-        contactPhone: "+1 (555) 456-7890",
-        imageUrl:
-          "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400",
-        status: "completed",
-        createdAt: "2024-01-05",
-      },
-      {
-        id: 4,
-        title: "Product Launch Event",
-        description:
-          "Be the first to see our revolutionary new product. Live demonstrations and Q&A session.",
-        date: "2024-02-10",
-        startTime: "19:00",
-        endTime: "22:00",
-        location: "Grand Hotel Ballroom",
-        category: "Product Launch",
-        capacity: 200,
-        registered: 156,
-        price: 0,
-        clubId: "tech-club",
-        contactEmail: "launch@innovationcorp.com",
-        contactPhone: "+1 (555) 321-0987",
-        imageUrl:
-          "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400",
-        status: "cancelled",
-        createdAt: "2024-01-08",
-      },
-    ];
-    setEvents(sampleEvents);
+  // Fetch events from backend
+  const fetchEvents = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await eventService.getAllEvents();
+      if (response.success) {
+        setEvents(response.data);
+      } else {
+        toast.error(response.message || 'Failed to fetch events');
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      toast.error('Failed to fetch events from server');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const clubs = [
     { value: "tech-club", label: "Tech Club", color: "bg-blue-500" },
@@ -128,55 +59,50 @@ const EventManagement = () => {
     { value: "environmental-club", label: "Environmental Club", color: "bg-emerald-500" }
   ];
 
-  const statusOptions = [
-    {
-      value: "",
-      label: "Select status",
-    },
-    {
-      value: "upcoming",
-      label: "Upcoming",
-      color: "bg-blue-100 text-blue-800",
-    },
-    {
-      value: "ongoing",
-      label: "Ongoing",
-      color: "bg-green-100 text-green-800",
-    },
-    {
-      value: "completed",
-      label: "Completed",
-      color: "bg-gray-100 text-gray-800",
-    },
-    {
-      value: "cancelled",
-      label: "Cancelled",
-      color: "bg-red-100 text-red-800",
-    },
-  ];
+
 
   // Add new event function for DialogueBox
-  const addEvent = useCallback((formData) => {
-    const newEvent = {
-      id: Date.now(),
-      ...formData,
-      registered: 0,
-      createdAt: new Date().toISOString(),
-    };
-    setEvents(prev => [newEvent, ...prev]);
-    toast.success("Event created successfully!");
+  const addEvent = useCallback(async (formData) => {
+    try {
+      const response = await eventService.createEvent(formData);
+      if (response.success) {
+        setEvents(prev => [response.data, ...prev]);
+        toast.success("Event created successfully!");
+        setShowCreateForm(false);
+      } else {
+        toast.error(response.message || 'Failed to create event');
+      }
+    } catch (error) {
+      console.error('Error creating event:', error);
+      toast.error('Failed to create event');
+    }
   }, []);
 
   // Update event function for DialogueBox
-  const updateEvent = useCallback((formData) => {
-    setEvents(prev => 
-      prev.map((event) =>
-        event.id === editingEvent.id
-          ? { ...event, ...formData, updatedAt: new Date().toISOString() }
-          : event
-      )
-    );
-    toast.success("Event updated successfully!");
+  const updateEvent = useCallback(async (formData) => {
+    try {
+      const response = await eventService.updateEvent({
+        ...formData,
+        _id: editingEvent._id
+      });
+      if (response.success) {
+        setEvents(prev => 
+          prev.map((event) =>
+            event._id === editingEvent._id
+              ? response.data
+              : event
+          )
+        );
+        toast.success("Event updated successfully!");
+        setShowCreateForm(false);
+        setEditingEvent(null);
+      } else {
+        toast.error(response.message || 'Failed to update event');
+      }
+    } catch (error) {
+      console.error('Error updating event:', error);
+      toast.error('Failed to update event');
+    }
   }, [editingEvent]);
 
   // Reset form function for DialogueBox
@@ -190,29 +116,34 @@ const EventManagement = () => {
     setShowCreateForm(true);
   }, []);
 
-  const handleDelete = useCallback((eventId) => {
+  const handleDelete = useCallback(async (eventId) => {
     if (window.confirm("Are you sure you want to delete this event?")) {
-      setEvents(prev => prev.filter((event) => event.id !== eventId));
-      toast.success("Event deleted successfully!");
+      try {
+        const response = await eventService.deleteEvent(eventId);
+        if (response.success) {
+          setEvents(prev => prev.filter((event) => event._id !== eventId));
+          toast.success("Event deleted successfully!");
+        } else {
+          toast.error(response.message || 'Failed to delete event');
+        }
+      } catch (error) {
+        console.error('Error deleting event:', error);
+        toast.error('Failed to delete event');
+      }
     }
   }, []);
 
-  const handleStatusChange = useCallback((eventId, newStatus) => {
-    setEvents(prev =>
-      prev.map((event) =>
-        event.id === eventId ? { ...event, status: newStatus } : event
-      )
-    );
-    toast.success("Event status updated!");
-  }, []);
+
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
       event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
       event.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      filterStatus === "all" || event.status === filterStatus;
+    
+    // Status filtering using automatic status
+    const autoStatus = getEventStatus(event);
+    const matchesStatus = filterStatus === "all" || autoStatus === filterStatus;
     
     // Date filtering
     let matchesDate = true;
@@ -234,7 +165,8 @@ const EventManagement = () => {
     return matchesSearch && matchesStatus && matchesDate;
   });
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (event) => {
+    const status = getEventStatus(event);
     switch (status) {
       case "upcoming":
         return <Clock className="w-4 h-4" />;
@@ -260,15 +192,16 @@ const EventManagement = () => {
     return colors[index];
   };
 
-  const getStatusColor = (status) => {
-    const statusObj = statusOptions.find((s) => s.value === status);
-    return statusObj ? statusObj.color : "bg-gray-100 text-gray-800";
+  const getStatusColor = (event) => {
+    const status = getEventStatus(event);
+    const config = getStatusBadgeConfig(status);
+    return config.color;
   };
 
   const totalEvents = events.length;
-  const upcomingEvents = events.filter((e) => e.status === "upcoming").length;
+  const upcomingEvents = events.filter((e) => getEventStatus(e) === "upcoming").length;
   const totalRegistrations = events.reduce(
-    (sum, event) => sum + event.registered,
+    (sum, event) => sum + (event.registeredStudents ? event.registeredStudents.length : 0),
     0
   );
 
@@ -285,15 +218,6 @@ const EventManagement = () => {
               Manage and organize all your events
             </p>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowCreateForm(true)}
-            className="mt-4 sm:mt-0 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Create Event
-          </motion.button>
         </div>
 
         {/* Stats Cards */}
@@ -301,6 +225,7 @@ const EventManagement = () => {
           totalEvents={totalEvents}
           upcomingEvents={upcomingEvents}
           totalRegistrations={totalRegistrations}
+          events={events}
         />
 
         {/* Search and Filters */}
@@ -313,33 +238,36 @@ const EventManagement = () => {
           setStartDate={setStartDate}
           endDate={endDate}
           setEndDate={setEndDate}
-          statusOptions={statusOptions.filter(option => option.value !== "")} // Remove empty option for search filter
+          statusOptions={[
+            { value: "upcoming", label: "Upcoming" },
+            { value: "ongoing", label: "Ongoing" },
+            { value: "completed", label: "Completed" },
+            { value: "cancelled", label: "Cancelled" }
+          ]}
         />
 
-        {/* Create/Edit Event Dialog */}
-        <DialogueBox
-          showCreateForm={showCreateForm}
-          resetForm={resetForm}
-          statusOptions={statusOptions}
-          editingEvent={editingEvent}
-          addEvent={addEvent}
-          updateEvent={updateEvent}
-          clubs={clubs}
-        />
+        
 
         {/* Events List */}
-        <EventList
-          filteredEvents={filteredEvents}
-          getStatusIcon={getStatusIcon}
-          getStatusColor={getStatusColor}
-          getCategoryColor={getCategoryColor}
-          statusOptions={statusOptions.filter(option => option.value !== "")}
-          clubs={clubs}
-          moment={moment}
-          handleEdit={handleEdit}
-          handleDelete={handleDelete}
-          handleStatusChange={handleStatusChange}
-        />
+        {loading ? (
+          <div className="bg-white rounded-xl shadow-sm border p-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-500">Loading events...</p>
+            </div>
+          </div>
+        ) : (
+          <EventList
+            filteredEvents={filteredEvents}
+            getStatusIcon={getStatusIcon}
+            getStatusColor={getStatusColor}
+            getCategoryColor={getCategoryColor}
+            clubs={clubs}
+            moment={moment}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+          />
+        )}
       </div>
     </div>
   );
