@@ -154,7 +154,7 @@ const RegisterEvent = () => {
         <div className={`text-center mb-12 transition-all duration-1000 transform ${
           isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
         }`}>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-700 via-blue-600 to-purple-600 dark:from-white dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-green-700 mb-4">
             My Registered Events
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-300">

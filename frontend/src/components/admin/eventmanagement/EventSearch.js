@@ -15,17 +15,17 @@ const EventSearch = ({
 }) => {
   const [showDateFilters, setShowDateFilters] = useState(false);
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border">
+    <div className=" ">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 " />
             <input
               type="text"
               placeholder="Search events by title, description, or location..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full bg-gray-300 dark:bg-slate-600 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -33,7 +33,7 @@ const EventSearch = ({
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 bg-gray-300 dark:bg-slate-600 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="all">All Status</option>
             {statusOptions.map((status) => (
@@ -48,7 +48,7 @@ const EventSearch = ({
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowDateFilters(!showDateFilters)}
             className={`px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center gap-2 transition-colors ${
-              showDateFilters ? 'bg-blue-50 border-blue-300 text-blue-700' : 'hover:bg-gray-50'
+              showDateFilters ? 'bg-blue-50 border-blue-300 bg-gray-300 dark:bg-slate-600' : 'hover:bg-gray-50'
             }`}
           >
             <motion.div
@@ -78,25 +78,25 @@ const EventSearch = ({
           >
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium  mb-2">
                   From Date
                 </label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-300 dark:bg-slate-600"
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium  mb-2">
                   To Date
                 </label>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-300 dark:bg-slate-600"
                 />
               </div>
               <div className="flex items-end">
@@ -107,7 +107,7 @@ const EventSearch = ({
                     setStartDate("");
                     setEndDate("");
                   }}
-                  className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="px-4 py-2 bg-green-800 hover:bg-gray-200 hover:text-black rounded-lg transition-colors"
                 >
                   Clear Dates
                 </motion.button>
