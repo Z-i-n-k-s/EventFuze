@@ -4,20 +4,20 @@ const userModel = require("../../models/userModel");
 
 async function joinClub(req, res) {
   try {
-    const { clubId, userId } = req.body;
+    const { clubId, email } = req.body;
 
-    if (!clubId || !userId) {
+    if (!clubId || !email) {
       return res.status(400).json({
-        message: "clubId and userId are required",
+        message: "clubId and email are required",
         success: false,
         error: true,
       });
     }
 
     // Validate ObjectId format
-    if (!mongoose.Types.ObjectId.isValid(clubId) || !mongoose.Types.ObjectId.isValid(userId)) {
+    if (!mongoose.Types.ObjectId.isValid(clubId)) {
       return res.status(400).json({
-        message: "Invalid clubId or userId",
+        message: "Invalid clubId",
         success: false,
         error: true,
       });
@@ -33,13 +33,23 @@ async function joinClub(req, res) {
       });
     }
 
+    // Find user by email
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found with this email",
+        success: false,
+        error: true,
+      });
+    }
+
     // Check if user is already a member of the club
     const existsInClub = club.members.find(
-      (m) => m.userId.toString() === userId
+      (m) => m.userId.toString() === user._id.toString()
     );
     if (existsInClub) {
       return res.status(400).json({
-        message: "You are already a member of this club",
+        message: "User is already a member of this club",
         success: false,
         error: true,
       });
@@ -47,21 +57,11 @@ async function joinClub(req, res) {
 
     // Add user to club members
     club.members.push({
-      userId,
+      userId: user._id,
       role: "Member",
       joinedAt: new Date(),
     });
     await club.save();
-
-    // Find user
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
-        error: true,
-      });
-    }
 
     // Add club to user's profile if not already added
     const existsInUser = user.clubs.find(
