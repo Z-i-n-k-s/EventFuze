@@ -35,6 +35,7 @@ const ClubAdminPanel = () => {
   const navItems = [
     { name: "My Club", icon: <FaUniversity size={20} />, path: "club-dashboard" },
     { name: "Manage Events", icon: <FaCalendarAlt size={20} />, path: "manage-events" },
+    { name: "Milestones", icon: <FaCalendarAlt size={20} />, path: "club-milestones" },
     { name: "Club Members", icon: <FaUsers size={20} />, path: "club-members" },
     
   ];

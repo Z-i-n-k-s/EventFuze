@@ -9,22 +9,25 @@ async function deleteMilestone(req, res) {
     }
 
     const club = await clubModel.findById(clubId);
-    if (!club) return res.status(404).json({ message: "Club not found", success: false, error: true });
+    if (!club) {
+      return res.status(404).json({ message: "Club not found", success: false, error: true });
+    }
 
-    const milestone = club.milestones.id(milestoneId);
-    if (!milestone) return res.status(404).json({ message: "Milestone not found", success: false, error: true });
-
-    milestone.remove();
-    await club.save();
+    const updatedClub = await clubModel.findByIdAndUpdate(
+      clubId,
+      { $pull: { milestones: { _id: milestoneId } } },
+      { new: true }
+    );
 
     res.json({
-      data: club,
+      data: updatedClub,
       message: "Milestone deleted successfully",
       success: true,
       error: false,
     });
   } catch (err) {
-    res.status(400).json({ message: err.message || err, success: false, error: true });
+    console.error(err);
+    res.status(500).json({ message: err.message || err, success: false, error: true });
   }
 }
 

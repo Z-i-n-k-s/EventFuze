@@ -6,7 +6,9 @@ import SummaryApi from "../../common";
 
 const ClubMembers = () => {
   const user = useSelector((state) => state?.user?.user);
-  const presidentClubId = user?.clubs?.find((c) => c.role === "President")?.clubId;
+  const presidentClubId = user?.clubs?.find(
+    (c) => c.role === "President"
+  )?.clubId;
 
   const [members, setMembers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,7 +29,9 @@ const ClubMembers = () => {
       });
       const data = await res.json();
       if (data.success) {
-        setMembers((data.data || []).map((m) => ({ ...m, status: m.status || "Joined" })));
+        setMembers(
+          (data.data || []).map((m) => ({ ...m, status: m.status || "Joined" }))
+        );
       } else console.error(data.message);
     } catch (err) {
       console.error("Failed to fetch members.", err);
@@ -49,37 +53,22 @@ const ClubMembers = () => {
         member.userId?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
-  // Remove member API call
-  const handleRemoveMember = async (id) => {
-    if (!presidentClubId) return;
-    setShowLoader(true);
-    try {
-      const res = await fetch(SummaryApi.removeMember.url, {
-        method: SummaryApi.removeMember.method,
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clubId: presidentClubId, userId: id }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setMembers(members.map((member) => (member._id === id ? { ...member, status: "Removed" } : member)));
-        setRemoveConfirm(null);
-      } else console.error(data.message);
-    } catch (err) {
-      console.error("Failed to remove member.", err);
-    } finally {
-      setShowLoader(false);
-    }
-  };
-
   const handleAddMember = (newMember) => {
-    setMembers([...members, { ...newMember, _id: Date.now().toString(), status: "Joined" }]);
+    setMembers([
+      ...members,
+      { ...newMember, _id: Date.now().toString(), status: "Joined" },
+    ]);
+    fetchAllClubMembers();
   };
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   return (
@@ -117,19 +106,36 @@ const ClubMembers = () => {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700 shadow-lg rounded-xl overflow-hidden">
           <thead className="bg-gray-50 dark:bg-slate-800">
             <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Member</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Joined Date</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                #
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Member
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Role
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Joined Date
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-200 dark:divide-slate-700">
             {filteredMembers.length > 0 ? (
               filteredMembers.map((member, index) => (
-                <tr key={member._id} className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{index + 1}</td>
+                <tr
+                  key={member._id}
+                  className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                    {index + 1}
+                  </td>
                   <td className="px-6 py-4 flex items-center gap-3">
                     <div className="h-10 w-10 flex-shrink-0">
                       {member.profilePic ? (
@@ -144,9 +150,13 @@ const ClubMembers = () => {
                         </div>
                       )}
                     </div>
-                    <span className="text-gray-800 dark:text-white font-medium">{member.name}</span>
+                    <span className="text-gray-800 dark:text-white font-medium">
+                      {member.name}
+                    </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{member.role}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                    {member.role}
+                  </td>
                   <td className="px-6 py-4 text-sm">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -158,7 +168,9 @@ const ClubMembers = () => {
                       {member.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{formatDate(member.joinedAt)}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                    {formatDate(member.joinedAt)}
+                  </td>
                   <td className="px-6 py-4 text-sm">
                     {member.status !== "Removed" && (
                       <button
@@ -173,7 +185,10 @@ const ClubMembers = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center text-gray-500 dark:text-gray-400 py-6">
+                <td
+                  colSpan="6"
+                  className="text-center text-gray-500 dark:text-gray-400 py-6"
+                >
                   No members found matching your search.
                 </td>
               </tr>
@@ -187,9 +202,15 @@ const ClubMembers = () => {
         member={removeConfirm}
         clubId={presidentClubId}
         onClose={() => setRemoveConfirm(null)}
-        onConfirm={handleRemoveMember}
+        onConfirm={() => fetchAllClubMembers()}
       />
-      {showAddMember && <AddMemberModal onClose={() => setShowAddMember(false)} onAdd={handleAddMember} />}
+
+      {showAddMember && (
+        <AddMemberModal
+          onClose={() => setShowAddMember(false)}
+          onAdd={handleAddMember}
+        />
+      )}
     </div>
   );
 };
