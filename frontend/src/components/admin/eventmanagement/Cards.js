@@ -71,7 +71,7 @@ const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
               animate="visible"
               transition={{ delay: index * 0.1, duration: 0.5 }}
               whileHover={{ y: -2, transition: { duration: 0.2 } }}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 relative overflow-hidden"
+              className="bg-green-100 rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 relative overflow-hidden"
             >
               {/* Gradient accent */}
               <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${card.gradient}`} />
@@ -107,7 +107,7 @@ const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
           initial="hidden" 
           animate="visible"
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
+          className="bg-pink-200 rounded-xl p-4 shadow-sm border border-gray-100"
         >
           <div className="flex items-center gap-3">
             <div className="p-2 bg-green-50 rounded-lg">
@@ -125,7 +125,7 @@ const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
           initial="hidden"
           animate="visible" 
           transition={{ delay: 0.5 }}
-          className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
+          className="bg-blue-100 rounded-xl p-4 shadow-sm border border-gray-100"
         >
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-50 rounded-lg">

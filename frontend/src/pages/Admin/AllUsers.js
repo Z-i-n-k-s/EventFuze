@@ -87,20 +87,20 @@ const AllUsers = () => {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
+    <div className="min-h-screen p-6 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 dark:from-slate-900 dark:via-slate-800/30 dark:to-slate-900/40">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold text-green-700 dark:text-green-500 mb-2">
             User Management
           </h1>
-          <p className="text-slate-600 text-lg">Manage your finance platform users</p>
+          <p className="text-lg text-slate-600 dark:text-slate-300">Manage your finance platform users</p>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Total Users Card */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
+          <div className="bg-green-100 dark:bg-green-900/30 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
@@ -109,19 +109,19 @@ const AllUsers = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-800">Total Users</h3>
-                  <p className="text-sm text-slate-500">Currently showing filtered results</p>
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Total Users</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Currently showing filtered results</p>
                 </div>
               </div>
             </div>
-            <div className="text-4xl font-bold text-slate-800 mb-2">{totalUsers.toLocaleString()}</div>
-            <div className="text-sm text-slate-500">
+            <div className="text-4xl font-bold text-slate-800 dark:text-slate-100 mb-2">{totalUsers.toLocaleString()}</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">
               Out of {allUsers.length.toLocaleString()} total users
             </div>
           </div>
 
           {/* New Users Card */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
+          <div className="bg-pink-100 dark:bg-pink-900/30 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
@@ -130,15 +130,17 @@ const AllUsers = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-800">New Users</h3>
-                  <p className="text-sm text-slate-500">Joined in the last 7 days</p>
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">New Users</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Joined in the last 7 days</p>
                 </div>
               </div>
             </div>
-            <div className="text-4xl font-bold text-slate-800 mb-2">+{recentlyAdded.toLocaleString()}</div>
+            <div className="text-4xl font-bold text-slate-800 dark:text-slate-100 mb-2">+{recentlyAdded.toLocaleString()}</div>
             <div className="flex items-center space-x-2">
               <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${
-                recentlyAdded > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
+                recentlyAdded > 0 
+                  ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300' 
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
               }`}>
                 {recentlyAdded > 0 ? (
                   <>
@@ -155,7 +157,7 @@ const AllUsers = () => {
           </div>
 
           {/* Admin Users Card */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
+          <div className="bg-blue-100 dark:bg-blue-900/30 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
@@ -164,24 +166,24 @@ const AllUsers = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-800">Admin Users</h3>
-                  <p className="text-sm text-slate-500">Users with admin privileges</p>
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Admin Users</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Users with admin privileges</p>
                 </div>
               </div>
             </div>
-            <div className="text-4xl font-bold text-slate-800 mb-2">
+            <div className="text-4xl font-bold text-slate-800 dark:text-slate-100 mb-2">
               {allUsers.filter((u) => u.role === "ADMIN").length.toLocaleString()}
             </div>
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-slate-500 dark:text-slate-400">
               {((allUsers.filter((u) => u.role === "ADMIN").length / Math.max(allUsers.length, 1)) * 100).toFixed(1)}% of total users
             </div>
           </div>
         </div>
 
         {/* Filters Section */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-slate-800">Filter & Search</h3>
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Filter & Search</h3>
             {(dateFilter.from || dateFilter.to || searchQuery || roleFilter !== "All" || sortOrder !== "desc") && (
               <button
                 onClick={() => {
@@ -190,7 +192,7 @@ const AllUsers = () => {
                   setRoleFilter("All");
                   setSortOrder("desc");
                 }}
-                className="px-4 py-2 text-sm text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 border border-slate-200 hover:border-red-200 flex items-center space-x-2"
+                className="px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors duration-200 border border-slate-200 dark:border-slate-700 hover:border-red-200 dark:hover:border-red-700 flex items-center space-x-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -202,23 +204,23 @@ const AllUsers = () => {
           <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 items-end">
             {/* Search Input */}
             <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-slate-600 mb-2">Search Users</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Search Users</label>
               <input
                 type="text"
                 placeholder="Search by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-slate-50 focus:bg-white"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200"
               />
             </div>
 
             {/* Role Filter */}
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-2">Role</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Role</label>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-slate-50 focus:bg-white"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200"
               >
                 <option value="All">All Roles</option>
                 <option value="ADMIN">Admin</option>
@@ -228,11 +230,11 @@ const AllUsers = () => {
 
             {/* Sort Order */}
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-2">Sort By</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Sort By</label>
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-slate-50 focus:bg-white"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200"
               >
                 <option value="desc">Newest First</option>
                 <option value="asc">Oldest First</option>
@@ -241,34 +243,34 @@ const AllUsers = () => {
 
             {/* From Date */}
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-2">From Date</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">From Date</label>
               <input
                 type="date"
                 value={dateFilter.from}
                 onChange={(e) => setDateFilter({ ...dateFilter, from: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-slate-50 focus:bg-white"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200"
               />
             </div>
 
             {/* To Date */}
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-2">To Date</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">To Date</label>
               <input
                 type="date"
                 value={dateFilter.to}
                 onChange={(e) => setDateFilter({ ...dateFilter, to: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-slate-50 focus:bg-white"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200"
               />
             </div>
           </div>
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
-                <tr className="bg-gradient-to-r from-slate-800 to-slate-700">
+                <tr className="bg-gradient-to-r from-slate-800 to-slate-700 dark:from-slate-900 dark:to-slate-800">
                   <th className="px-6 py-4 text-left text-sm font-semibold text-white">Sr.</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-white">User</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-white">Email</th>
@@ -277,7 +279,7 @@ const AllUsers = () => {
                   <th className="px-6 py-4 text-center text-sm font-semibold text-white">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {showLoader ? (
                   <tr>
                     <td colSpan="6" className="py-16 text-center">
@@ -288,37 +290,37 @@ const AllUsers = () => {
                   </tr>
                 ) : filteredUsers.length > 0 ? (
                   filteredUsers.map((el, index) => (
-                    <tr key={el._id || index} className="hover:bg-slate-50 transition-colors duration-150">
-                      <td className="px-6 py-4 text-sm font-medium text-slate-600">{index + 1}</td>
+                    <tr key={el._id || index} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-150">
+                      <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">{index + 1}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-semibold text-sm">
                             {el?.name?.charAt(0)?.toUpperCase() || "U"}
                           </div>
                           <div>
-                            <p className="font-semibold text-slate-800">{el?.name}</p>
+                            <p className="font-semibold text-slate-800 dark:text-slate-200">{el?.name}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{el?.email}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">{el?.email}</td>
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                             el.role === "ADMIN"
-                              ? "bg-purple-100 text-purple-700 border border-purple-200"
-                              : "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                              ? "bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700"
+                              : "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700"
                           }`}
                         >
                           {el?.role}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">
+                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
                         {moment(el?.createdAt).format("MMM DD, YYYY")}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex justify-center gap-2">
                           <button
-                            className="p-2.5 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-all duration-200 border border-amber-200 hover:border-amber-500"
+                            className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 hover:bg-amber-500 hover:text-white transition-all duration-200 border border-amber-200 dark:border-amber-700 hover:border-amber-500"
                             onClick={() => {
                               setUpdateUserDetails(el);
                               setOpenUpdateRole(true);
@@ -328,7 +330,7 @@ const AllUsers = () => {
                             <FiEdit className="w-4 h-4" />
                           </button>
                           <button
-                            className="p-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-500 hover:text-white transition-all duration-200 border border-red-200 hover:border-red-500"
+                            className="p-2.5 rounded-xl bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white transition-all duration-200 border border-red-200 dark:border-red-700 hover:border-red-500"
                             onClick={() => {
                               setUpdateUserDetails(el);
                               setOpenDelete(true);
@@ -338,7 +340,7 @@ const AllUsers = () => {
                             <MdDelete className="w-4 h-4" />
                           </button>
                           <button
-                            className="p-2.5 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white transition-all duration-200 border border-blue-200 hover:border-blue-500"
+                            className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-white transition-all duration-200 border border-blue-200 dark:border-blue-700 hover:border-blue-500"
                             onClick={() => {
                               setUpdateUserDetails(el);
                               setOpenUserDetails(true);
@@ -355,11 +357,11 @@ const AllUsers = () => {
                   <tr>
                     <td colSpan="6" className="py-16 text-center">
                       <div className="flex flex-col items-center space-y-3">
-                        <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center">
-                          <div className="w-8 h-8 bg-slate-300 rounded-lg"></div>
+                        <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                          <div className="w-8 h-8 bg-slate-300 dark:bg-slate-600 rounded-lg"></div>
                         </div>
-                        <p className="text-slate-500 font-medium">No users found</p>
-                        <p className="text-slate-400 text-sm">Try adjusting your filters</p>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium">No users found</p>
+                        <p className="text-slate-400 dark:text-slate-500 text-sm">Try adjusting your filters</p>
                       </div>
                     </td>
                   </tr>
