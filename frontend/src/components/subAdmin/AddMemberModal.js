@@ -1,21 +1,50 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import SummaryApi from "../../common"; // Adjust the path if needed
 
 const AddMemberModal = ({ onClose, onAdd }) => {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("Member"); // default role
+  const [role, setRole] = useState("Member");
+  const user = useSelector((state) => state?.user?.user);
+  const clubId = user?.clubs?.find((c) => c.role === "President")?.clubId;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) return;
 
-    // Prevent adding President directly
-    if (role === "President") {
-      alert("You cannot add a member as President directly.");
+    if (!clubId) {
+      toast.error("Club ID not found. Cannot add member.");
       return;
     }
 
-    onAdd({ email, role, status: "Active" });
-    onClose();
+    if (role === "President") {
+      toast.error("You cannot add a member as President directly.");
+      return;
+    }
+
+    try {
+      const response = await fetch(SummaryApi.addMember.url, {
+        method: SummaryApi.addMember.method,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ clubId, email, role }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        toast.success("Member added successfully!");
+        onAdd({ email, role, status: "Active" });
+        onClose();
+      } else {
+        toast.error(data.message || "Failed to add member");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error adding member to club");
+    }
   };
 
   return (
@@ -40,7 +69,7 @@ const AddMemberModal = ({ onClose, onAdd }) => {
           >
             <option value="Member">Member</option>
             <option value="Moderator">Moderator</option>
-            <option value="VicePresident">VicePresident</option>
+            <option value="VicePresident">Vice President</option>
             <option value="President" disabled>
               President
             </option>
