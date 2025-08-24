@@ -75,7 +75,7 @@ const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
               animate="visible"
               transition={{ delay: index * 0.1, duration: 0.5 }}
               whileHover={{ y: -2, transition: { duration: 0.2 } }}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 relative overflow-hidden"
+              className="bg-green-100 rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 relative overflow-hidden"
             >
               {/* Gradient accent */}
               <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${card.gradient}`} />
@@ -103,6 +103,85 @@ const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
           );
         })}
       </div>
+
+
+      {/* Secondary Stats Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <motion.div
+          variants={cardVariants}
+          initial="hidden" 
+          animate="visible"
+          transition={{ delay: 0.4 }}
+          className="bg-pink-200 rounded-xl p-4 shadow-sm border border-gray-100"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-50 rounded-lg">
+              <CheckCircle className="w-4 h-4 text-green-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-600">Completed</p>
+              <p className="text-lg font-bold text-gray-900">{completedEvents}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible" 
+          transition={{ delay: 0.5 }}
+          className="bg-blue-100 rounded-xl p-4 shadow-sm border border-gray-100"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <Clock className="w-4 h-4 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-600">Ongoing</p>
+              <p className="text-lg font-bold text-gray-900">{ongoingEvents}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.6 }}
+          className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-red-50 rounded-lg">
+              <XCircle className="w-4 h-4 text-red-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-600">Cancelled</p>
+              <p className="text-lg font-bold text-gray-900">{cancelledEvents}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.7 }}
+          className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-yellow-50 rounded-lg">
+              <Users className="w-4 h-4 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-600">Avg. Capacity</p>
+              <p className="text-lg font-bold text-gray-900">
+                {totalEvents > 0 ? Math.round(totalCapacity / totalEvents) : 0}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
     </div>
   );
 };

@@ -102,7 +102,7 @@ const JoinClub = ({ isDarkMode }) => {
         transition={{ delay: 0.7, type: "spring", stiffness: 200 }}
         viewport={{ once: false }}
       >
-        Join Our Team
+        Join A Club
       </motion.button>
     </motion.section>
   );
