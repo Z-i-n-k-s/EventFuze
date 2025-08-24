@@ -40,7 +40,11 @@ eventSchema.pre("save", function (next) {
 
   // Optional: ensure registration deadline is after start
   if (this.registrationDeadline < this.registrationStart) {
-    return next(new Error("Registration deadline cannot be before registration start date"));
+    return next(
+      new Error(
+        "Registration deadline cannot be before registration start date"
+      )
+    );
   }
 
   next();
