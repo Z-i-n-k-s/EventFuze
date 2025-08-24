@@ -1,4 +1,5 @@
 const clubModel = require("../../models/clubModel");
+const userModel = require("../../models/userModel");
 
 async function getClubMembers(req, res) {
   try {
@@ -11,8 +12,22 @@ async function getClubMembers(req, res) {
     const club = await clubModel.findById(clubId);
     if (!club) return res.status(404).json({ message: "Club not found", success: false, error: true });
 
+    // Fetch user details for each member
+    const membersWithDetails = await Promise.all(
+      club.members.map(async (member) => {
+        const user = await userModel.findById(member.userId).select("name profilePic");
+        return {
+          userId: member.userId,
+          role: member.role,
+          joinedAt: member.joinedAt,
+          name: user ? user.name : "Unknown",
+          profilePic: user ? user.profilePic : null,
+        };
+      })
+    );
+
     res.json({
-      data: club.members,
+      data: membersWithDetails,
       message: "Club members fetched successfully",
       success: true,
       error: false,

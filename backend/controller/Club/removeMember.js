@@ -1,4 +1,5 @@
 const clubModel = require("../../models/clubModel");
+const userModel = require("../../models/userModel");
 
 async function removeMember(req, res) {
   try {
@@ -14,8 +15,16 @@ async function removeMember(req, res) {
     const memberIndex = club.members.findIndex((m) => m.userId === userId);
     if (memberIndex === -1) return res.status(404).json({ message: "Member not found", success: false, error: true });
 
+    // Remove from club members
     club.members.splice(memberIndex, 1);
     await club.save();
+
+    // Remove club from user's clubs array
+    const user = await userModel.findById(userId);
+    if (user) {
+      user.clubs = user.clubs.filter((c) => c.clubId !== clubId);
+      await user.save();
+    }
 
     res.json({
       data: club,

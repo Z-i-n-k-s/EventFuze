@@ -11,7 +11,18 @@ const userSchema = new mongoose.Schema(
       enum: ["SUPER_ADMIN", "CLUB_ADMIN", "STUDENT"],
       default: "STUDENT",
     },
-    clubs: [String], // IDs of clubs the student has joined
+    clubs: [
+      {
+        clubId: { type: String, required: true },
+        clubName: { type: String, required: true },
+        role: {
+          type: String,
+          enum: ["Member", "Moderator", "VicePresident", "President"],
+          default: "Member",
+        },
+        joinedAt: { type: Date, default: Date.now },
+      },
+    ], // Array of clubs with role and joined date
     resetToken: String,
     resetTokenExpiry: Date,
   },

@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    Award,
-    Building2,
-    Calendar,
-    Edit,
-    Image,
-    MoreVertical,
-    Trash2
+  Award,
+  Building2,
+  Calendar,
+  Edit,
+  Image,
+  MoreVertical,
+  Trash2
 } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -80,7 +80,7 @@ const ClubList = ({
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredClubs.map((club, index) => (
               <motion.tr
-                key={club.id}
+                key={club._id || club.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
@@ -114,10 +114,10 @@ const ClubList = ({
                 </td>
                 <td className="px-6 py-4">
                   <div className="text-sm text-gray-900">
-                    {club.adminId}
+                    {club.adminName || "No admin assigned"}
                   </div>
                   <div className="text-xs text-gray-500">
-                    Admin ID
+                    Club Admin
                   </div>
                 </td>
                 <td className="px-6 py-4">
@@ -161,7 +161,7 @@ const ClubList = ({
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => toggleExpanded(club.id)}
+                      onClick={() => toggleExpanded(club._id)}
                       className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200"
                       title="View details"
                     >
@@ -170,7 +170,7 @@ const ClubList = ({
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => handleDelete(club.id)}
+                      onClick={() => handleDelete(club._id || club.id)}
                       className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                       title="Delete club"
                     >
@@ -193,7 +193,7 @@ const ClubList = ({
             exit={{ opacity: 0, height: 0 }}
             className="border-t border-gray-200 bg-gray-50"
           >
-            {filteredClubs.find(club => club.id === expandedClub) && (
+            {filteredClubs.find(club => club._id === expandedClub) && (
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* Club Information */}
@@ -202,24 +202,24 @@ const ClubList = ({
                     <div className="space-y-2">
                       <div className="text-sm">
                         <span className="text-gray-600">Name:</span>
-                        <span className="ml-2 font-medium">{filteredClubs.find(club => club.id === expandedClub)?.name}</span>
+                        <span className="ml-2 font-medium">{filteredClubs.find(club => club._id === expandedClub)?.name}</span>
                       </div>
                       <div className="text-sm">
                         <span className="text-gray-600">Description:</span>
-                        <p className="mt-1 text-gray-900">{filteredClubs.find(club => club.id === expandedClub)?.description}</p>
+                        <p className="mt-1 text-gray-900">{filteredClubs.find(club => club._id === expandedClub)?.description}</p>
                       </div>
                       <div className="text-sm">
-                        <span className="text-gray-600">Admin ID:</span>
-                        <span className="ml-2 font-medium">{filteredClubs.find(club => club.id === expandedClub)?.adminId}</span>
+                        <span className="text-gray-600">Admin:</span>
+                        <span className="ml-2 font-medium">{filteredClubs.find(club => club._id === expandedClub)?.adminName || "No admin assigned"}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Members */}
                   <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-gray-900">Members ({filteredClubs.find(club => club.id === expandedClub)?.members?.length || 0})</h4>
+                    <h4 className="text-sm font-medium text-gray-900">Members ({filteredClubs.find(club => club._id === expandedClub)?.members?.length || 0})</h4>
                     <div className="space-y-2">
-                      {filteredClubs.find(club => club.id === expandedClub)?.members?.map((member, index) => (
+                      {filteredClubs.find(club => club._id === expandedClub)?.members?.map((member, index) => (
                         <div key={index} className="flex justify-between items-center text-sm">
                           <span className="text-gray-600">{member.userId}</span>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -240,7 +240,7 @@ const ClubList = ({
                     <h4 className="text-sm font-medium text-gray-900">Quick Actions</h4>
                     <div className="space-y-2">
                       <button
-                        onClick={() => handleEdit(filteredClubs.find(club => club.id === expandedClub))}
+                        onClick={() => handleEdit(filteredClubs.find(club => club._id === expandedClub))}
                         className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors duration-200"
                       >
                         Edit Club
@@ -256,11 +256,11 @@ const ClubList = ({
                 </div>
 
                 {/* Images Section */}
-                {filteredClubs.find(club => club.id === expandedClub)?.images?.length > 0 && (
+                {filteredClubs.find(club => club._id === expandedClub)?.images?.length > 0 && (
                   <div className="mt-6">
                     <h4 className="text-sm font-medium text-gray-900 mb-3">Club Images</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {filteredClubs.find(club => club.id === expandedClub)?.images?.map((image, index) => (
+                      {filteredClubs.find(club => club._id === expandedClub)?.images?.map((image, index) => (
                         <div key={index} className="relative">
                           <img
                             src={image}
@@ -277,11 +277,11 @@ const ClubList = ({
                 )}
 
                 {/* Milestones Section */}
-                {filteredClubs.find(club => club.id === expandedClub)?.milestones?.length > 0 && (
+                {filteredClubs.find(club => club._id === expandedClub)?.milestones?.length > 0 && (
                   <div className="mt-6">
                     <h4 className="text-sm font-medium text-gray-900 mb-3">Milestones</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {filteredClubs.find(club => club.id === expandedClub)?.milestones?.map((milestone, index) => (
+                      {filteredClubs.find(club => club._id === expandedClub)?.milestones?.map((milestone, index) => (
                         <div key={index} className="border border-gray-200 rounded-lg p-4">
                           <div className="flex items-start justify-between mb-2">
                             <h5 className="font-medium text-gray-900">{milestone.title}</h5>
