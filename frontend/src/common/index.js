@@ -129,7 +129,7 @@ const SummaryApi = {
   },
   updateEvent: {
     url: `${backendDomain}/api/update-event`,
-    method: "put",
+    method: "post",
   },
   deleteEvent: {
     url: `${backendDomain}/api/delete-event`,

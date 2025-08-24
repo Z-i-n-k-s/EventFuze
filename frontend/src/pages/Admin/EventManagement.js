@@ -12,7 +12,7 @@ import Cards from "../../components/admin/eventmanagement/Cards";
 import EventList from "../../components/admin/eventmanagement/EventList";
 import EventSearch from "../../components/admin/eventmanagement/EventSearch";
 import { getEventStatus, getStatusBadgeConfig } from "../../helpers/eventStatusHelper";
-import { eventService } from "../../services/eventService";
+import SummaryApi from "../../common";
 
 const EventManagement = () => {
   const [events, setEvents] = useState([]);
@@ -26,21 +26,30 @@ const EventManagement = () => {
 
   // Fetch events from backend
   const fetchEvents = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await eventService.getAllEvents();
-      if (response.success) {
-        setEvents(response.data);
-      } else {
-        toast.error(response.message || 'Failed to fetch events');
-      }
-    } catch (error) {
-      console.error('Error fetching events:', error);
-      toast.error('Failed to fetch events from server');
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    
+    const response = await fetch(SummaryApi.getAllEvents.url, {
+      method: SummaryApi.getAllEvents.method,
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }, // r
+    });
+
+    const data = await response.json(); // 
+
+    if (response.ok) {
+      setEvents(data.data);
+    } else {
+      toast.error(data.message || 'Failed to fetch events');
     }
-  }, []);
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    toast.error('Failed to fetch events from server');
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
 
   useEffect(() => {
     fetchEvents();
@@ -61,55 +70,10 @@ const EventManagement = () => {
 
 
 
-  // Add new event function for DialogueBox
-  const addEvent = useCallback(async (formData) => {
-    try {
-      const response = await eventService.createEvent(formData);
-      if (response.success) {
-        setEvents(prev => [response.data, ...prev]);
-        toast.success("Event created successfully!");
-        setShowCreateForm(false);
-      } else {
-        toast.error(response.message || 'Failed to create event');
-      }
-    } catch (error) {
-      console.error('Error creating event:', error);
-      toast.error('Failed to create event');
-    }
-  }, []);
 
-  // Update event function for DialogueBox
-  const updateEvent = useCallback(async (formData) => {
-    try {
-      const response = await eventService.updateEvent({
-        ...formData,
-        _id: editingEvent._id
-      });
-      if (response.success) {
-        setEvents(prev => 
-          prev.map((event) =>
-            event._id === editingEvent._id
-              ? response.data
-              : event
-          )
-        );
-        toast.success("Event updated successfully!");
-        setShowCreateForm(false);
-        setEditingEvent(null);
-      } else {
-        toast.error(response.message || 'Failed to update event');
-      }
-    } catch (error) {
-      console.error('Error updating event:', error);
-      toast.error('Failed to update event');
-    }
-  }, [editingEvent]);
 
-  // Reset form function for DialogueBox
-  const resetForm = useCallback(() => {
-    setShowCreateForm(false);
-    setEditingEvent(null);
-  }, []);
+
+ 
 
   const handleEdit = useCallback((event) => {
     setEditingEvent(event);
@@ -117,21 +81,30 @@ const EventManagement = () => {
   }, []);
 
   const handleDelete = useCallback(async (eventId) => {
-    if (window.confirm("Are you sure you want to delete this event?")) {
-      try {
-        const response = await eventService.deleteEvent(eventId);
-        if (response.success) {
-          setEvents(prev => prev.filter((event) => event._id !== eventId));
-          toast.success("Event deleted successfully!");
-        } else {
-          toast.error(response.message || 'Failed to delete event');
-        }
-      } catch (error) {
-        console.error('Error deleting event:', error);
-        toast.error('Failed to delete event');
+  if (window.confirm("Are you sure you want to delete this event?")) {
+    try {
+      const response = await fetch(SummaryApi.deleteEvent.url, {
+        method: SummaryApi.deleteEvent.method,
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ eventId }), 
+      });
+
+      const data = await response.json(); 
+
+      if (response.ok) {
+        setEvents(prev => prev.filter((event) => event._id !== eventId));
+        toast.success("Event deleted successfully!");
+      } else {
+        toast.error(data.message || 'Failed to delete event');
       }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast.error('Failed to delete event');
     }
-  }, []);
+  }
+}, []);
+
 
 
 

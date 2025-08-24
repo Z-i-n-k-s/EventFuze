@@ -88,7 +88,7 @@ router.post("/leave-club", authToken, leaveClub);
 //Events
 router.post("/create-event",authToken,   createEvent);
 router.get("/all-events", getAllEvents);
-router.put("/update-event",authToken,  updateEvent);
+router.post("/update-event",authToken,  updateEvent);
 router.delete("/delete-event", authToken, deleteEvent);
 router.post("/events/club", getEventsByClub);
 
