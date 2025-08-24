@@ -26,7 +26,7 @@ const ClubDetails = () => {
   const club = clubFromState;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-slate-600 dark:via-slate-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-green-200 via-emerald-50 to-green-100 dark:from-slate-600 dark:via-slate-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-16 relative">
         {/* Background Decorative Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

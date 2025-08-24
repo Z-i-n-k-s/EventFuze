@@ -44,7 +44,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-amber-50 text-gray-800 transition-all duration-500 dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-800 dark:text-white">
+    <div className="min-h-screen bg-gradient-to-br from-green-200 via-green-100 to-amber-50 text-gray-800 transition-all duration-500 dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-800 dark:text-white">
       {/* Hero Section */}
       <section
         ref={sectionRef}
@@ -107,15 +107,6 @@ const Home = () => {
             Explore your interests, develop skills, and make lasting
             connections.
           </motion.p>
-
-
-
-
-
-
-
-          
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -179,7 +170,7 @@ const Home = () => {
                 stiffness: 100,
               }}
               whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              className="bg-green-100 backdrop-blur-md p-6 rounded-2xl shadow-lg text-center border border-white/20 dark:bg-slate-600/90 dark:border-slate-700/30"
+              className="bg-blue-200 hover:bg-green-800 hover:text-white backdrop-blur-md p-6 rounded-2xl shadow-lg text-center border border-white/20 dark:bg-slate-600/90 dark:border-slate-700/30 dark:hover:bg-green-800 "
             >
               <div className="text-green-500 mb-4 flex justify-center dark:text-green-400">
                 {stat.icon}
@@ -187,7 +178,7 @@ const Home = () => {
               <div className="text-3xl font-bold mb-2 dark:text-white">
                 {stat.number}
               </div>
-              <div className="text-gray-600 dark:text-gray-300">
+              <div className="">
                 {stat.label}
               </div>
             </motion.div>
