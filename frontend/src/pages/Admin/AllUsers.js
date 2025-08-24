@@ -29,6 +29,11 @@ const AllUsers = () => {
     profilePic: "",
   });
 
+   // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+
   const fetchAllUsers = async () => {
     setShowLoader(true);
     try {
@@ -85,6 +90,13 @@ const AllUsers = () => {
   const recentlyAdded = allUsers.filter((u) =>
     moment(u.createdAt).isAfter(moment().subtract(7, "days"))
   ).length;
+
+
+   // Pagination logic
+  const indexOfLastUser = currentPage * itemsPerPage;
+  const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 dark:from-slate-900 dark:via-slate-800/30 dark:to-slate-900/40">
@@ -265,7 +277,8 @@ const AllUsers = () => {
           </div>
         </div>
 
-        {/* Users Table */}
+
+ {/* Users Table */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full">
@@ -288,10 +301,12 @@ const AllUsers = () => {
                       </div>
                     </td>
                   </tr>
-                ) : filteredUsers.length > 0 ? (
-                  filteredUsers.map((el, index) => (
+                ) : currentUsers.length > 0 ? (
+                  currentUsers.map((el, index) => (
                     <tr key={el._id || index} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-150">
-                      <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">{index + 1}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">
+                        {indexOfFirstUser + index + 1}
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-semibold text-sm">
@@ -369,6 +384,28 @@ const AllUsers = () => {
               </tbody>
             </table>
           </div>
+           {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-end items-center space-x-2 p-4">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-200 disabled:opacity-50"
+              >
+                Prev
+              </button>
+              <span className="text-sm text-slate-700 dark:text-slate-300">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-200 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Modals */}
