@@ -86,7 +86,6 @@ const CreateEvent = ({ onSave, onClose }) => {
       fetchClubs();
     }
   }, [user, onClose]);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewEvent((prev) => ({
