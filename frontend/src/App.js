@@ -11,6 +11,7 @@ import { setUserDetails } from "./store/userSlice";
 import Footer from "./components/shared/Footer";
 import Header from "./components/shared/Header";
 
+
 function App() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.user?.user);
@@ -47,19 +48,23 @@ function App() {
   return (
     <Context.Provider value={{ fetchUserDetails }}>
       <ToastContainer />
+      
       <div className="flex">
         {/* Main content */}
         <div className="flex-1 flex flex-col">
           <Header />
 
+        
           <main className="min-h-[calc(100vh-120px)]">
             <Outlet />
+            
           </main>
 
           {/* Footer only for student/user pages and public pages */}
           {user && !isAdminPanel && !isPublicRoute && <Footer />}
         </div>
       </div>
+
     </Context.Provider>
   );
 }

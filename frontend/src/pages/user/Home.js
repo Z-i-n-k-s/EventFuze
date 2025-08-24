@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { ChevronDown, Users, Calendar, Award, ArrowRight } from 'lucide-react';
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, Users, Calendar, Award, ArrowRight, MessageCircle, X } from 'lucide-react';
 import JoinClub from "../../components/user/JoinClub";
 import ImagesEvent from "../../components/user/ImagesEvent";
 import LandingScroll from "../../components/user/LandingScroll";
 import UpcomingEvent from "../../components/user/UpcomingEvent";
+import ChatbotBody from "../../components/shared/chatbot/ChatbotBody";
 
 const Home = () => {
   const sectionRef = useRef(null);
   const [isInView, setIsInView] = useState(false);
-
+const [isChatOpen, setIsChatOpen] = useState(false);
   // Intersection Observer to detect when section is in view
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -158,6 +159,30 @@ const Home = () => {
       <UpcomingEvent/>
       <ImagesEvent></ImagesEvent>
       <JoinClub  />
+      {/* Floating Chatbot Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => setIsChatOpen((prev) => !prev)}
+          className="w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center shadow-lg transition"
+        >
+          {isChatOpen ? <X size={28} /> : <MessageCircle size={28} />}
+        </button>
+      </div>
+
+      {/* Chatbot Popup */}
+      <AnimatePresence>
+        {isChatOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-20 right-6 w-96 max-w-[90vw] z-50"
+          >
+            <ChatbotBody onClose={() => setIsChatOpen(false)}  />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
