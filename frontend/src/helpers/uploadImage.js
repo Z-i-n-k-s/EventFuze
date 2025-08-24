@@ -20,6 +20,12 @@ const uploadImage = async (images, preset = "mern_product") => {
       });
 
       const data = await response.json();
+      
+      if (!response.ok) {
+        console.error("Cloudinary upload error:", data);
+        throw new Error(data.error?.message || `Upload failed with status ${response.status}`);
+      }
+      
       return data; // single upload response
     }
 
@@ -34,7 +40,14 @@ const uploadImage = async (images, preset = "mern_product") => {
         body: formData,
       });
 
-      return response.json();
+      const data = await response.json();
+      
+      if (!response.ok) {
+        console.error("Cloudinary upload error:", data);
+        throw new Error(data.error?.message || `Upload failed with status ${response.status}`);
+      }
+      
+      return data;
     });
 
     const results = await Promise.all(uploadPromises);

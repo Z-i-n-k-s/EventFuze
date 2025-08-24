@@ -1,20 +1,22 @@
-import { Calendar, Clock, Users, TrendingUp, CheckCircle, XCircle } from 'lucide-react'
-import React from 'react'
 import { motion } from "framer-motion";
+import { Calendar, CheckCircle, Clock, TrendingUp, Users, XCircle } from 'lucide-react';
+import React from 'react';
+import { getEventStatus } from '../../../helpers/eventStatusHelper';
 
 const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
   // Calculate additional metrics from the events data
-  const completedEvents = events?.filter(e => e.status === 'completed').length || 0;
-  const cancelledEvents = events?.filter(e => e.status === 'cancelled').length || 0;
-  const ongoingEvents = events?.filter(e => e.status === 'ongoing').length || 0;
+  const completedEvents = events?.filter(e => getEventStatus(e) === 'completed').length || 0;
+  const cancelledEvents = events?.filter(e => getEventStatus(e) === 'cancelled').length || 0;
+  const ongoingEvents = events?.filter(e => getEventStatus(e) === 'ongoing').length || 0;
   
   // Calculate average registration rate
-  const totalCapacity = events?.reduce((sum, event) => sum + (event.capacity || 0), 0) || 1;
+  const totalCapacity = events?.reduce((sum, event) => sum + (event.maxParticipants || 0), 0) || 1;
   const registrationRate = totalCapacity > 0 ? Math.round((totalRegistrations / totalCapacity) * 100) : 0;
   
   // Calculate revenue from paid events
   const totalRevenue = events?.reduce((sum, event) => {
-    return sum + ((event.registered || 0) * (event.price || 0));
+    const registeredCount = event.registeredStudents ? event.registeredStudents.length : 0;
+    return sum + (registeredCount * (event.registrationFee || 0));
   }, 0) || 0;
 
   const cardVariants = {
@@ -46,7 +48,7 @@ const Cards = ({ totalEvents, upcomingEvents, totalRegistrations, events }) => {
     {
       title: "Revenue Generated",
       value: `$${totalRevenue.toLocaleString()}`,
-      change: `From ${events?.filter(e => (e.price || 0) > 0).length || 0} paid events`,
+      change: `From ${events?.filter(e => (e.registrationFee || 0) > 0).length || 0} paid events`,
       changeColor: "text-purple-600",
       icon: TrendingUp,
       iconBg: "bg-purple-50", 

@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Award,
-  Building2,
-  Calendar,
-  Edit,
-  Image,
-  MoreVertical,
-  Trash2
+    Award,
+    Building2,
+    Calendar,
+    Edit,
+    Image,
+    MoreVertical,
+    Trash2
 } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -221,10 +221,10 @@ const ClubList = ({
                     <div className="space-y-2">
                       {filteredClubs.find(club => club._id === expandedClub)?.members?.map((member, index) => (
                         <div key={index} className="flex justify-between items-center text-sm">
-                          <span className="text-gray-600">{member.userId}</span>
+                          <span className="text-gray-600">{member.userName || member.userId}</span>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                             member.role === 'President' ? 'bg-purple-100 text-purple-800' :
-                            member.role === 'Vice President' ? 'bg-blue-100 text-blue-800' :
+                            member.role === 'VicePresident' ? 'bg-blue-100 text-blue-800' :
                             member.role === 'Moderator' ? 'bg-green-100 text-green-800' :
                             'bg-gray-100 text-gray-800'
                           }`}>

@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Clock, MapPin, Trash2, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { AlertCircle, Calendar, CheckCircle, Clock, MapPin, Trash2, XCircle } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { getEventStatus, getStatusBadgeConfig } from '../../helpers/eventStatusHelper';
 
 const RegisterEvent = () => {
   const [registeredEvents, setRegisteredEvents] = useState([]);
@@ -99,39 +100,22 @@ const RegisterEvent = () => {
     };
   }, []);
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'upcoming':
-        return {
-          color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-          icon: <Clock className="w-3 h-3" />,
-          label: 'Upcoming'
-        };
-      case 'ongoing':
-        return {
-          color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-          icon: <CheckCircle className="w-3 h-3" />,
-          label: 'Ongoing'
-        };
-      case 'completed':
-        return {
-          color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',
-          icon: <CheckCircle className="w-3 h-3" />,
-          label: 'Completed'
-        };
-      case 'cancelled':
-        return {
-          color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-          icon: <XCircle className="w-3 h-3" />,
-          label: 'Cancelled'
-        };
-      default:
-        return {
-          color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',
-          icon: <AlertCircle className="w-3 h-3" />,
-          label: 'Unknown'
-        };
-    }
+  const getStatusBadge = (event) => {
+    const status = getEventStatus(event);
+    const config = getStatusBadgeConfig(status);
+    
+    const iconMap = {
+      'Clock': <Clock className="w-3 h-3" />,
+      'TrendingUp': <CheckCircle className="w-3 h-3" />,
+      'CheckCircle': <CheckCircle className="w-3 h-3" />,
+      'XCircle': <XCircle className="w-3 h-3" />
+    };
+    
+    return {
+      color: config.color,
+      icon: iconMap[config.icon] || <AlertCircle className="w-3 h-3" />,
+      label: config.label
+    };
   };
 
   const handleUnregister = (event) => {
@@ -158,7 +142,8 @@ const RegisterEvent = () => {
   // Filtered events based on search and status
   const filteredEvents = registeredEvents.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || event.status === filterStatus;
+    const autoStatus = getEventStatus(event);
+    const matchesStatus = filterStatus === 'all' || autoStatus === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
@@ -189,25 +174,25 @@ const RegisterEvent = () => {
           </div>
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center border border-slate-200/50 dark:border-slate-600/50">
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {filteredEvents.filter(e => e.status === 'upcoming').length}
+              {filteredEvents.filter(e => getEventStatus(e) === 'upcoming').length}
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-300">Upcoming</div>
           </div>
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center border border-slate-200/50 dark:border-slate-600/50">
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {filteredEvents.filter(e => e.status === 'ongoing').length}
+              {filteredEvents.filter(e => getEventStatus(e) === 'ongoing').length}
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-300">Ongoing</div>
           </div>
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center border border-slate-200/50 dark:border-slate-600/50">
             <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">
-              {filteredEvents.filter(e => e.status === 'completed').length}
+              {filteredEvents.filter(e => getEventStatus(e) === 'completed').length}
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-300">Completed</div>
           </div>
         </div>
 
-        {/* Search & Filter - moved here */}
+        {/* Search & Filter */}
         <div className={`flex flex-col sm:flex-row gap-4 mb-8 transition-all duration-1000 transform ${
           isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
         }`}>
@@ -234,7 +219,7 @@ const RegisterEvent = () => {
         {/* Events List */}
         <div className="space-y-4">
           {filteredEvents.map((event, index) => {
-            const statusConfig = getStatusBadge(event.status);
+            const statusConfig = getStatusBadge(event);
             
             return (
               <div
@@ -280,7 +265,7 @@ const RegisterEvent = () => {
 
                   {/* Action Button */}
                   <div className="flex-shrink-0">
-                    {(event.status === 'upcoming' || event.status === 'ongoing') ? (
+                    {(getEventStatus(event) === 'upcoming' || getEventStatus(event) === 'ongoing') ? (
                       <button
                         onClick={() => handleUnregister(event)}
                         className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:shadow-lg flex items-center gap-2 transform hover:scale-105"
@@ -290,7 +275,7 @@ const RegisterEvent = () => {
                       </button>
                     ) : (
                       <div className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-4 py-2 rounded-xl font-medium cursor-not-allowed">
-                        {event.status === 'completed' ? 'Completed' : 'Cancelled'}
+                        {getEventStatus(event) === 'completed' ? 'Completed' : 'Cancelled'}
                       </div>
                     )}
                   </div>
